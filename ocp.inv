@@ -3,14 +3,29 @@ localhost
 
 [all:vars]
 GOPATH="/root/.go"
-IMAGE_URL=
+ansible_ssh_private_key_file=/root/.ssh/id_rsa_perf"
+OPENSHIFT_INSTALL_USER=root
 OPENSHIFT_CLEANUP=True
-OPENSHIFT_INSTALL_PLATFORM=libvirt
-OPENSHIFT_INSTALL_BASE_DOMAIN=tt.testing
-OPENSHIFT_INSTALL_CLUSTER_NAME=test1
-OPENSHIFT_INSTALL_PULL_SECRET_PATH="/root/pull-secret.json"
-OPENSHIFT_INSTALL_LIBVIRT_URI="qemu+tcp://192.168.122.1/system"
+OPENSHIFT_INSTALL_PLATFORM=aws
+OPENSHIFT_INSTALL_BASE_DOMAIN=
+OPENSHIFT_INSTALL_CLUSTER_NAME=
 OPENSHIFT_INSTALL_EMAIL_ADDRESS=nelluri@redhat.com
-OPENSHIFT_INSTALL_LIBVIRT_IMAGE='file:///root/rhcos-qemu.qcow2.gz'
 OPENSHIFT_INSTALL_PASSWORD=redhat
-OPENSHIFT_INSTALL_SSH_PUB_KEY_PATH="/root/.ssh/id_rsa_perf.pub"
+ansible_ssh_private_key_file=/root/.ssh/id_rsa_perf"
+
+# AWS cluster vars
+AWS_PROFILE=
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+OPENSHIFT_INSTALL_SSH_PUB_KEY="$(<~/.ssh/id_rsa_perf.pub)"
+OPENSHIFT_INSTALL_PULL_SECRET="$(<~/.secrets/openshift_pull_secret.json)"
+OPENSHIFT_INSTALL_AWS_REGION="us-east-1"
+
+# Libvirt cluster vars
+OPENSHIFT_IMAGE_URL=
+OPENSHIFT_INSTALL_LIBVIRT_URI="qemu+tcp://192.168.122.1/system"
+OPENSHIFT_INSTALL_LIBVIRT_IMAGE='file:///root/rhcos-qemu.qcow2.gz'
+
+# Cleanup
+OPENSHIFT_LIBVIRT_INSTALL_CLEANUP=False
+OPENSHIFT_AWS_INSTALL_CLEANUP=True

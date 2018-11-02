@@ -10,61 +10,82 @@
         - golang
         - gcc
         - git
-
-    - name: copy the cleanup script
-      copy:
-        src: cleanup.sh
-        dest: "{{ ansible_env.HOME }}/cleanup.sh"
-
-    - name: cleanup if the cluster is already installed
-      shell: "printf 'y' | {{ ansible_env.HOME }}/cleanup.sh"
-      when: OPENSHIFT_CLEANUP | default(True) | bool
+        - golang-bin 
+        - gcc-c++
 
     - name: create gopath dir
       file:
         path: "{{ GOPATH | default('/root/.go') }}"
         state: directory
 
-    #- name: add go to the path
-    #  shell: echo "export GOPATH={{ GOPATH }}" > {{ ansible_env.HOME }}/.bash_profile && source ~/.bash_profile
+    - name: set workdir
+      set_fact:
+        workdir: "{{ GOPATH }}/src/github.com/openshift/installer"
+
+    - name: cleanup installer code if it exists
+      file:
+        path: "{{ workdir }}"
+        state: absent
+
+    - name: cleanup vars file
+      file:
+        path: /tmp/ocp-env.sh
+        state: absent
 
     - name: get the installer and its dependencies
       shell: go get "{{ item }}"
       with_items:
         - github.com/openshift/installer/data
-        - github.com/shurcooL/vfsgen
-        - github.com/sirupsen/logrus
-        - gopkg.in/alecthomas/kingpin.v2
-
-    - name: set workdir
-      set_fact: 
-        workdir: "{{ GOPATH }}/src/github.com/openshift/installer"
+      environment:
+        GOPATH: "{{ GOPATH }}"
 
     - name: build installer binary
-      shell: "{{ workdir }}/hack/build.sh"
+      shell: cd {{ workdir }}; hack/build.sh"
       environment:
         GOPATH: "{{ GOPATH }}"
 
     - name: get terraform binary
-      shell: "{{ workdir }}/hack/get-terraform.sh"
+      shell: cd {{ workdir }}; hack/get-terraform.sh"
       environment:
         GOPATH: "{{ GOPATH }}"
 
-    - name: download the image
-      get_url:
-        url: "{{ IMAGE_URL }}"
-        dest: /root/rhcos-qemu.qcow2.gz
+    - name: copy the script containing the OCP vars
+      template:
+        src: ocp-aws-env.sh.j2
+        dest: /tmp/ocp-env.sh
+        mode: 0755
+      when: OPENSHIFT_INSTALL_PLATFORM == "aws"
 
-    - name: run openshift installer
-      shell: "{{ workdir }}/bin/openshift-install cluster --log-level=debug"
-      environment:
-        GOPATH: "{{ GOPATH }}"
-        OPENSHIFT_INSTALL_PLATFORM:  "{{ OPENSHIFT_INSTALL_PLATFORM }}"
-        OPENSHIFT_INSTALL_BASE_DOMAIN: "{{ OPENSHIFT_INSTALL_BASE_DOMAIN }}"
-        OPENSHIFT_INSTALL_CLUSTER_NAME: "{{ OPENSHIFT_INSTALL_CLUSTER_NAME }}"
-        OPENSHIFT_INSTALL_PULL_SECRET_PATH: "{{ OPENSHIFT_INSTALL_PULL_SECRET_PATH }}"
-        OPENSHIFT_INSTALL_LIBVIRT_URI: "{{ OPENSHIFT_INSTALL_LIBVIRT_URI }}"
-        OPENSHIFT_INSTALL_EMAIL_ADDRESS: "{{ OPENSHIFT_INSTALL_EMAIL_ADDRESS }}"
-        OPENSHIFT_INSTALL_LIBVIRT_IMAGE: "{{ OPENSHIFT_INSTALL_LIBVIRT_IMAGE }}"
-        OPENSHIFT_INSTALL_PASSWORD: "{{ OPENSHIFT_INSTALL_PASSWORD }}"
-        OPENSHIFT_INSTALL_SSH_PUB_KEY_PATH: "{{ OPENSHIFT_INSTALL_SSH_PUB_KEY_PATH }}"
+    - name: installer config
+      shell: "source /tmp/ocp-env.sh; cd {{ workdir }}; bin/openshift-install create install-config"
+      
+    - name: manifests
+      shell: "source /tmp/ocp-env.sh; cd {{ workdir }}; bin/openshift-install create manifests"
+
+    - name: ignition configs
+      shell: "source /tmp/ocp-env.sh; cd {{ workdir }}; bin/openshift-install create ignition-configs"
+    
+    - name: set the user in ignition configs
+      replace:
+        path: "{{ item }}"
+        regexp: "core"
+        replace: "{{ OPENSHIFT_INSTALL_USER }}"
+      with_items:
+        - "{{ workdir }}/bootstrap.ign"
+        - "{{ workdir }}/master.ign"
+        - "{{ workdir }}/worker.ign"
+    
+    - block:
+       - name: download the image
+         get_url:
+           url: "{{ OPENSHIFT_IMAGE_URL }}"
+           dest: /root/rhcos-qemu.qcow2.gz
+
+       - name: run openshift installer on libvirt
+         shell: "source /tmp/ocp-env.sh; cd {{ workdir }}; bin/openshift-install create cluster --log-level=debug"
+      when: OPENSHIFT_INSTALL_PLATFORM == "libvirt"
+
+    - block:
+        - name: run openshift installer on aws
+          shell: "source /tmp/ocp-env.sh; cd {{ workdir }}; bin/openshift-install create cluster --log-level=debug"
+      when: OPENSHIFT_INSTALL_PLATFORM == "aws"
