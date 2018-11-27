@@ -89,3 +89,30 @@
         - name: run openshift installer on aws
           shell: "source /tmp/ocp-env.sh; cd {{ workdir }}; bin/openshift-install create cluster --log-level=debug"
       when: OPENSHIFT_INSTALL_PLATFORM == "aws"
+
+    - name: ensure that .kube dir exists
+      file:
+        path: /root/.kube
+        state: directory
+
+    - name: copy the kubeconfig
+      copy:
+        src: "{{ workdir }}/auth/kubeconfig"
+        dest: /root/.kube/config
+
+    - name: pick one master node
+      shell: oc get nodes -l node-role.kubernetes.io/master | awk 'NR>1 {print $1}' | tail -n1
+      register: master_node
+
+    - name: remove the label on one of the masters
+      shell: oc label node {{ master_node.stdout }} node-role.kubernetes.io/master-
+
+    - name: add the controller label
+      shell: oc label node {{ master_node.stdout }} {{ item }}
+      with_items:
+        - "node-role.kubernetes.io/controller=true"
+        - "role=controller"
+
+    - name: controller node
+      debug:
+        msg: "The controller node is {{ master_node.stdout }}"
