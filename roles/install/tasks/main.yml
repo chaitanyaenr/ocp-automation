@@ -1,0 +1,92 @@
+---
+- name: Install dependencies
+  package:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - golang
+    - gcc
+    - git
+    - golang-bin
+    - gcc-c++
+
+- name: create gopath dir
+  file:
+    path: "{{ GOPATH | default('/root/.go') }}"
+    state: directory
+
+- name: set workdir
+  set_fact:
+    workdir: "{{ GOPATH }}/src/github.com/openshift/installer"
+
+- name: cleanup installer code if it exists
+  file:
+    path: "{{ workdir }}"
+    state: absent
+
+- name: cleanup vars file
+  file:
+    path: /tmp/ocp-env.sh
+    state: absent
+
+- name: get the installer and its dependencies
+  shell: go get "{{ item }}"
+  with_items:
+    - github.com/openshift/installer/data
+  environment:
+     GOPATH: "{{ GOPATH }}"
+
+- name: build installer binary
+  shell: cd {{ workdir }}; hack/build.sh
+  environment:
+     GOPATH: "{{ GOPATH }}"
+
+- name: get terraform binary
+  shell: cd {{ workdir }}; hack/get-terraform.sh
+  environment:
+    GOPATH: "{{ GOPATH }}"
+
+- name: vars path
+  set_fact:
+     openshift_vars_file: "{{ansible_env.HOME}}/ocp-env.sh"
+
+- name: copy the script containing the OCP vars
+  template:
+    src: ocp-aws-env.sh.j2
+    dest: "{{ openshift_vars_file }}"
+    mode: 0755
+  when: OPENSHIFT_INSTALL_PLATFORM == "aws"
+
+- name: installer config
+  shell: "source {{ openshift_vars_file }}; cd {{ workdir }}; bin/openshift-install create install-config"
+
+- name: manifests
+  shell: "source {{ openshift_vars_file }}; cd {{ workdir }}; bin/openshift-install create manifests"
+
+- name: ignition configs
+  shell: "source {{ openshift_vars_file }}; cd {{ workdir }}; bin/openshift-install create ignition-configs"
+
+- name: set the user in ignition configs
+  replace:
+    path: "{{ item }}"
+    regexp: "core"
+    replace: "{{ OPENSHIFT_INSTALL_USER }}"
+  with_items:
+     - "{{ workdir }}/bootstrap.ign"
+     - "{{ workdir }}/master.ign"
+     - "{{ workdir }}/worker.ign"
+
+- block:
+    - name: download the image
+      get_url:
+        url: "{{ OPENSHIFT_IMAGE_URL }}"
+        dest: /root/rhcos-qemu.qcow2.gz
+
+    - name: run openshift installer on libvirt
+      shell: "source {{ openshift_vars_file }}; cd {{ workdir }}; bin/openshift-install create cluster --log-level=debug"
+  when: OPENSHIFT_INSTALL_PLATFORM == "libvirt"
+
+- block:
+    - name: run openshift installer on aws
+      shell: "source {{ openshift_vars_file }}; cd {{ workdir }}; bin/openshift-install create cluster --log-level=debug"
+  when: OPENSHIFT_INSTALL_PLATFORM == "aws"
