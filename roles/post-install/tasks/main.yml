@@ -1,69 +1,23 @@
 ---
-- name: set workdir
-  set_fact:
-    workdir: "{{ GOPATH }}/src/github.com/openshift/installer"
-
-- name: ensure that .kube dir exists
-  file:
-    path: /root/.kube
-    state: directory
-
-- name: copy the kubeconfig
-  copy:
-    src: "{{ workdir }}/auth/kubeconfig"
-    dest: /root/.kube/config
-
-- name: pick one master node
-  shell: oc get nodes -l node-role.kubernetes.io/master | awk 'NR>1 {print $1}' | tail -n1
-  register: controller_node
-
-- name: remove the label on one of the masters
-  shell: oc label node {{ controller_node.stdout }} node-role.kubernetes.io/master-
-
-- name: add the controller label
-  shell: oc label node {{ controller_node.stdout }} {{ item }}
-  with_items:
-    - "node-role.kubernetes.io/controller=true"
-    - "role=controller"
-
-- name: controller node
-  debug:
-    msg: "The controller node is {{ controller_node.stdout }}"
-
-- name: ensure that .kube dir exists on controller
-  file:
-    path: /root/.kube
-    state: directory
-  delegate_to: "{{ controller_node.stdout }}"
-
-- name: copy the kubeconfig to controller node
-  copy:
-    src: "{{ workdir }}/auth/kubeconfig"
-    dest: /root/.kube/config
-  delegate_to: "{{ controller_node.stdout }}"
-
-- name: copy perf private key to controller host
-  copy:
-    src: /root/.ssh/id_rsa
-    dest: /root/.ssh/id_rsa
-    mode: 0600
-  delegate_to: "{{ controller_node.stdout }}"
-
-- name: copy clusterloader binary
-  copy:
-    src: /usr/libexec/atomic-openshift/extended.test
-    dest: /root/extended.test
-  delegate_to: "{{ controller_node.stdout }}"
-
 - name: disable selinux in crio config
   lineinfile:
     path: /etc/crio/crio.conf
     regexp: '^selinux'
     line: 'selinux = false'
-  delegate_to: "{{ controller_node.stdout }}"
 
 - name: restart crio
   service:
     name: crio
     state: restarted
-  delegate_to: "{{ controller_node.stdout }}"
+
+- name: disable selinux
+  lineinfile:
+    path: /etc/selinux/config
+    regexp: 'selinux'
+    line: 'selinux=disabled'
+
+- name: temporarily disable selinux
+  shell: setenforce 0
+
+- name: pbench-agent image
+  shell: podman pull docker.io/ravielluri/image:agent

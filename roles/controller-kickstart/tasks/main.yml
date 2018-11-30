@@ -1,0 +1,28 @@
+---
+- name: set workdir
+  set_fact:
+    workdir: "{{ GOPATH }}/src/github.com/openshift/installer"
+
+- name: ensure that .kube dir exists on controller
+  file:
+    path: /root/.kube
+    state: directory
+
+- name: copy the kubeconfig to controller node
+  copy:
+    src: "{{ workdir }}/auth/kubeconfig"
+    dest: /root/.kube/config
+
+- name: copy perf private key to controller host
+  copy:
+    src: /root/.ssh/id_rsa
+    dest: /root/.ssh/id_rsa
+    mode: 0600
+
+- name: copy clusterloader binary
+  copy:
+    src: /usr/libexec/atomic-openshift/extended.test
+    dest: /root/extended.test
+
+- name: pbench-controller image
+  shell: podman pull docker.io/ravielluri/image:controller

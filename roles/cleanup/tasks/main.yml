@@ -2,7 +2,7 @@
     - name: copy the cleanup script
       copy:
         src: cleanup.sh
-        dest: {{ ansible_env.HOME }}/cleanup.sh
+        dest: "{{ ansible_env.HOME }}/cleanup.sh"
         mode: 0755
 
     - name: cleanup libvirt cluster
