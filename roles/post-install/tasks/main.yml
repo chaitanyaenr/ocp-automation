@@ -1,23 +1,64 @@
 ---
-- name: disable selinux in crio config
-  lineinfile:
-    path: /etc/crio/crio.conf
-    regexp: '^selinux'
-    line: 'selinux = false'
+- name: set workdir
+  set_fact:
+    workdir: "{{ GOPATH }}/src/github.com/openshift/installer"
 
-- name: restart crio
-  service:
-    name: crio
-    state: restarted
+- name: vars path
+  set_fact:
+    openshift_vars_file: "{{ansible_env.HOME}}/ocp-env.sh"
 
-- name: disable selinux
-  lineinfile:
-    path: /etc/selinux/config
-    regexp: 'selinux'
-    line: 'selinux=disabled'
+- name: ensure that .kube dir exists
+  file:
+    path: /root/.kube
+    state: directory
 
-- name: temporarily disable selinux
-  shell: setenforce 0
+- name: copy the kubeconfig
+  copy:
+    src: "{{ workdir }}/auth/kubeconfig"
+    dest: /root/.kube/config
 
-- name: pbench-agent image
-  shell: podman pull docker.io/ravielluri/image:agent
+- name: pick one master node
+  shell: oc get nodes -l node-role.kubernetes.io/master | awk 'NR>1 {print $1}' | tail -n1
+  register: controller_node
+
+- name: remove the label on one of the masters
+  shell: oc label node {{ controller_node.stdout }} node-role.kubernetes.io/master-
+
+- name: add the controller label
+  shell: oc label node {{ controller_node.stdout }} {{ item }} --overwrite=true
+  with_items:
+    - "node-role.kubernetes.io/controller=true"
+    - "role=controller"
+
+- name: controller node
+  debug:
+    msg: "The controller node is {{ controller_node.stdout }}"
+
+- name: get the public ip of the controller
+  shell: source {{ openshift_vars_file }}; aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,Tags[?Key==`Name`].Value|[0],State.Name,PrivateIpAddress,PublicIpAddress, PrivateDnsName]' --output text | column -t | grep {{ OPENSHIFT_INSTALL_CLUSTER_NAME }} | grep {{ controller_node.stdout }} | awk '{print $5}'
+  register: controller_public_ip
+
+- name: add controller to group
+  add_host: name={{ controller_public_ip.stdout }} groups=controller
+
+- name: nodes
+  shell: oc get nodes | awk 'NR>1 {print $1}'
+  register: ocp_nodes
+
+- name: add nodes to group
+  add_host: name={{ item }} groups=nodes
+  with_items:
+    - "{{ ocp_nodes.stdout }}"
+
+- name: get VpcId
+  shell: source {{ openshift_vars_file }}; aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,Tags[?Key==`Name`].Value|[0],State.Name,PrivateIpAddress,PublicIpAddress, PrivateDnsName, VpcId]' --output text | column -t | grep {{ OPENSHIFT_INSTALL_CLUSTER_NAME }} | awk '{print $7}' | head -n1
+  register: vpc_id
+
+- name: get security groups
+  shell: source {{ openshift_vars_file }}; aws ec2 describe-security-groups --filters "Name=vpc-id,Values={{ vpc_id.stdout }}" --output json | jq .SecurityGroups[].GroupId | 
+  register: security_groups
+
+- name: add inbound rule to allow traffic on 2022
+  shell: source {{ openshift_vars_file }}; aws ec2 authorize-security-group-ingress --group-id {{ item }} --protocol tcp --port 2022 --cidr 0.0.0.0/0
+  with_items:
+    - "{{ security_groups.stdout_lines }}"

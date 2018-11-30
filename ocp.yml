@@ -4,51 +4,10 @@
   roles:
     - { role: cleanup, when: (OPENSHIFT_AWS_INSTALL_CLEANUP | default(False) | bool) or (OPENSHIFT_LIBVIRT_INSTALL_CLEANUP | default(False) | bool) }
     - { role: install, when: OPENSHIFT_INSTALL | default(True) | bool }
-  tasks:
-    - name: set workdir
-      set_fact:
-        workdir: "{{ GOPATH }}/src/github.com/openshift/installer"
-
-    - name: vars path
-      set_fact:
-        openshift_vars_file: "{{ansible_env.HOME}}/ocp-env.sh"
-
-    - name: ensure that .kube dir exists
-      file:
-        path: /root/.kube
-        state: directory
-
-    - name: copy the kubeconfig
-      copy:
-        src: "{{ workdir }}/auth/kubeconfig"
-        dest: /root/.kube/config
-
-    - name: pick one master node
-      shell: oc get nodes -l node-role.kubernetes.io/master | awk 'NR>1 {print $1}' | tail -n1
-      register: controller_node
-
-    - name: remove the label on one of the masters
-      shell: oc label node {{ controller_node.stdout }} node-role.kubernetes.io/master-
-
-    - name: add the controller label
-      shell: oc label node {{ controller_node.stdout }} {{ item }}
-      with_items:
-        - "node-role.kubernetes.io/controller=true"
-        - "role=controller"
-
-    - name: controller node
-      debug:
-        msg: "The controller node is {{ controller_node.stdout }}"
-
-    - name: get the public ip of the controller
-      shell: source {{ openshift_vars_file }}; aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,Tags[?Key==`Name`].Value|[0],State.Name,PrivateIpAddress,PublicIpAddress, PrivateDnsName]' --output text | column -t | grep {{ OPENSHIFT_INSTALL_CLUSTER_NAME }} | grep {{ controller_node.stdout }} | awk '{print $5}'
-      register: controller_public_ip
-
-    - name: add controller to group
-      add_host: name={{ controller_public_ip.stdout }} groups=controller
-
+    - { role: post-install, when: OPENSHIFT_INSTALL | default(True) | bool }
+     
 - hosts: controller
   user: root
   roles:
-    - { role: controller-kickstart, when: OPENSHIFT_INSTALL | default(False) | bool }
-    - { role: post-install, when: OPENSHIFT_INSTALL | default(False) | bool }
+    - { role: controller-kickstart, when: OPENSHIFT_INSTALL | default(True) | bool }
+    - { role: node-config, when: OPENSHIFT_INSTALL | default(True) | bool }
