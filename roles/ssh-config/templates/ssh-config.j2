@@ -1,0 +1,8 @@
+Host ip*
+   StrictHostKeyChecking no
+   ProxyCommand ssh -W %h:%p {{ inventory_hostname }}
+   UserKnownHostsFile=/dev/null
+
+Host *
+   UserKnownHostsFile=/dev/null
+   StrictHostKeyChecking no
