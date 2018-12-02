@@ -60,6 +60,14 @@
 - name: installer config
   shell: "source {{ openshift_vars_file }}; cd {{ workdir }}; bin/openshift-install create install-config"
 
+- name: copy the config script to /tmp
+  copy:
+    src : config.py
+    dest: /tmp/config.py
+
+- name: set the number of master and worker node count
+  shell: python /tmp/config.py install-config "{{ workdir }}/install-config.yml" {{ OPENSHIFT_INSTALL_MASTER_COUNT }} {{ OPENSHIFT_INSTALL_WORKER_COUNT }}
+
 - name: manifests
   shell: "source {{ openshift_vars_file }}; cd {{ workdir }}; bin/openshift-install create manifests"
 

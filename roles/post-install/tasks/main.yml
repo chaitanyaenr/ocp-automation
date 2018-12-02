@@ -55,7 +55,7 @@
   register: vpc_id
 
 - name: get security groups
-  shell: source {{ openshift_vars_file }}; aws ec2 describe-security-groups --filters "Name=vpc-id,Values={{ vpc_id.stdout }}" --output json | jq .SecurityGroups[].GroupId | 
+  shell: source {{ openshift_vars_file }}; aws ec2 describe-security-groups --filters "Name=vpc-id,Values={{ vpc_id.stdout }}" --output json | jq .SecurityGroups[].GroupId
   register: security_groups
 
 - name: add inbound rule to allow traffic on 2022
