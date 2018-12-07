@@ -12,7 +12,9 @@ Clone the github repo:
 $ git clone https://github.com/chaitanyaenr/ocp-automation.git
 $ cd ocp-automation
 ```
-Set the env variables:
+Set the variables including AWS credentials, number of master/worker instances, instance type to use in AWS e.t.c
+You need to ssh as core user in case the install user is not set to root. It's recommended to use root user for
+pipeline to work seamlessly. At this point of time, all we need to do is to kickoff the installer like:
 ```
 $ ansible-playbook -vv -i ocp.inv ocp.yml
 ```

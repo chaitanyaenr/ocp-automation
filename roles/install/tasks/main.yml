@@ -66,10 +66,16 @@
     dest: /tmp/config.py
 
 - name: set the number of master and worker node count
-  shell: python /tmp/config.py install-config "{{ workdir }}/install-config.yml" {{ OPENSHIFT_INSTALL_MASTER_COUNT }} {{ OPENSHIFT_INSTALL_WORKER_COUNT }}
+  shell: python /tmp/config.py install-config "{{ workdir }}/install-config.yml" -master_count {{ OPENSHIFT_INSTALL_MASTER_COUNT }} -worker_count {{ OPENSHIFT_INSTALL_WORKER_COUNT }}
 
 - name: manifests
   shell: "source {{ openshift_vars_file }}; cd {{ workdir }}; bin/openshift-install create manifests"
+
+- name: set the instance type of master nodes
+  shell: python /tmp/config.py master_instances "{{ workdir }}/openshift/99_openshift-cluster-api_master-machines.yaml" -master_instance_type {{ OPENSHIFT_INSTALL_MASTER_INSTANCE_FLAVOR }}
+
+- name: set the instance type of master nodes
+  shell: python /tmp/config.py worker_instances "{{ workdir }}/openshift/99_openshift-cluster-api_worker-machineset.yaml" -worker_instance_type {{ OPENSHIFT_INSTALL_WORKER_INSTANCE_FLAVOR }}
 
 - name: ignition configs
   shell: "source {{ openshift_vars_file }}; cd {{ workdir }}; bin/openshift-install create ignition-configs"

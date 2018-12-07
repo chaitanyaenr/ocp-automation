@@ -21,7 +21,3 @@
 
 - name: pbench-agent image
   shell: podman pull docker.io/ravielluri/image:agent
-
-- name: vars path
-  set_fact:
-     openshift_vars_file: "{{ansible_env.HOME}}/ocp-env.sh"
