@@ -103,4 +103,8 @@
 - block:
     - name: run openshift installer on aws
       shell: "source {{ openshift_vars_file }}; cd {{ workdir }}; bin/openshift-install create cluster --log-level=debug"
+     
+    - name: sleep for sometime for the cluster to settle
+      pause:
+        minutes: 3
   when: OPENSHIFT_INSTALL_PLATFORM == "aws"

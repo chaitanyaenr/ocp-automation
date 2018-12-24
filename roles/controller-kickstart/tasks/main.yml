@@ -25,6 +25,16 @@
     dest: /root/.ssh/config
     mode: 0600
 
+- name: check if cluster loader binary exists
+  stat:
+    path: /usr/libexec/atomic-openshift/extended.test
+  register: extended.test
+
+- name: fail if the extended.test binary doesn't exist
+  fail:
+    msg: Please make sure extended.test exists on {{ ansible_inventory_host }} at /usr/libexec/atomic-openshift/extended.test.
+  when: extended.test.stat.exists == False 
+
 - name: copy clusterloader binary
   copy:
     src: /usr/libexec/atomic-openshift/extended.test

@@ -21,8 +21,8 @@
   shell: oc get nodes -l node-role.kubernetes.io/master | awk 'NR>1 {print $1}' | tail -n1
   register: controller_node
 
-- name: remove the label on one of the masters
-  shell: oc label node {{ controller_node.stdout }} node-role.kubernetes.io/master-
+  #- name: remove the label on one of the masters
+  #shell: oc label node {{ controller_node.stdout }} node-role.kubernetes.io/master-
 
 - name: add the controller label
   shell: oc label node {{ controller_node.stdout }} {{ item }} --overwrite=true
