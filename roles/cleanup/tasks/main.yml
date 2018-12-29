@@ -18,7 +18,7 @@
      openshift_vars_file: "{{ansible_env.HOME}}/ocp-env.sh"
 
 - name: cleanup aws cluster
-  shell: "source {{ openshift_vars_file }}; cd {{ workdir }}; bin/openshift-install destroy cluster --log-level=debug"
+  shell: "cd {{ workdir }}; bin/openshift-install destroy cluster --log-level=debug"
   when: OPENSHIFT_INSTALL_PLATFORM == "aws"
 
 - name: cleanup workdir

@@ -10,6 +10,7 @@
   user: root
   roles:
     - { role: controller-kickstart, when: OPENSHIFT_INSTALL | default(False) | bool }
+    - { role: disable-selinux, when: OPENSHIFT_INSTALL | default(False) | bool }
     - { role: node-config, when: OPENSHIFT_INSTALL | default(False) | bool }
     - { role: ssh-config, when: OPENSHIFT_INSTALL | default(False) | bool }
 
@@ -17,3 +18,4 @@
   user: root
   roles:
     - { role: node-config, when: OPENSHIFT_INSTALL | default(False) | bool }
+    - { role: disable-selinux, when: OPENSHIFT_INSTALL | default(False) | bool }

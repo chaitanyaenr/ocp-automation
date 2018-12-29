@@ -10,7 +10,7 @@ tmp_machineset = "/tmp/machine"
 tmp_master_manifests_file = "/tmp/99_openshift-cluster-api_master-machines.yaml"
 tmp_worker_manifests_file = "/tmp/99_openshift-cluster-api_worker-machineset.yaml"
 
-def install_config(cfg_path, master_count, worker_count):
+def install_config(cfg_path, master_count, worker_count, cluster_name):
     with open(cfg_path, 'r') as install_config:
         try:
             config = yaml.load(install_config)
@@ -20,6 +20,7 @@ def install_config(cfg_path, master_count, worker_count):
         with open(tmp_file_path, 'w') as f:
            config['machines'][0]['replicas'] = int(master_count)
            config['machines'][1]['replicas'] = int(worker_count)
+           config['metadata']['name'] = cluster_name
            yaml.dump(config, f,  default_flow_style=False)
     shutil.move(tmp_file_path, cfg_path)
 
@@ -45,9 +46,9 @@ def manifests(cfg_type, cfg_path, instance_type):
         else:
            print ("%s is not a valid config type, please check" %(cfg_type))
 
-def main(cfg_type, cfg_path, master_count, worker_count, master_instance_type, worker_instance_type):
+def main(cfg_type, cfg_path, master_count, worker_count, cluster_name, master_instance_type, worker_instance_type):
     if cfg_type == "install-config":
-        install_config(cfg_path, master_count, worker_count)
+        install_config(cfg_path, master_count, worker_count, cluster_name)
     elif cfg_type == "master_instances":
         manifests(cfg_type, cfg_path, master_instance_type)
     elif cfg_type == "worker_instances":
@@ -62,7 +63,8 @@ if __name__ == "__main__":
     parser.add_argument("config_path", help="config_path should point to the installer-config or machineset path")
     parser.add_argument("-master_count", help="number of master nodes")
     parser.add_argument("-worker_count", help="number of worker nodes")
+    parser.add_argument("-cluster_name", help="name of the cluster")
     parser.add_argument("-master_instance_type", help="AWS instance type to use for master node")
     parser.add_argument("-worker_instance_type", help="AWS instance type to use for worker node")
     args = parser.parse_args()
-    main(args.config_type, args.config_path, args.master_count, args.worker_count, args.master_instance_type, args.worker_instance_type)
+    main(args.config_type, args.config_path, args.master_count, args.worker_count, args.cluster_name, args.master_instance_type, args.worker_instance_type)

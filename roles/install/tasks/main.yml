@@ -36,40 +36,41 @@
   environment:
      GOPATH: "{{ GOPATH }}"
 
+- name: create .aws dir
+  file:
+    path: "{{ ansible_env.HOME }}/.aws"
+    state: directory
+
+- name: aws config
+  template:
+     src: config.j2
+     dest: "{{ ansible_env.HOME }}/.aws/config"
+
+- name: aws credentials
+  template:
+     src: credentials.j2
+     dest: "{{ ansible_env.HOME }}/.aws/credentials"
+
 - name: build installer binary
   shell: cd {{ workdir }}; hack/build.sh
   environment:
      GOPATH: "{{ GOPATH }}"
-
-- name: get terraform binary
-  shell: cd {{ workdir }}; hack/get-terraform.sh
-  environment:
-    GOPATH: "{{ GOPATH }}"
-
-- name: vars path
-  set_fact:
-     openshift_vars_file: "{{ansible_env.HOME}}/ocp-env.sh"
-
-- name: copy the script containing the OCP vars
-  template:
-    src: ocp-aws-env.sh.j2
-    dest: "{{ openshift_vars_file }}"
-    mode: 0755
-  when: OPENSHIFT_INSTALL_PLATFORM == "aws"
-
-- name: installer config
-  shell: "source {{ openshift_vars_file }}; cd {{ workdir }}; bin/openshift-install create install-config"
 
 - name: copy the config script to /tmp
   copy:
     src : config.py
     dest: /tmp/config.py
 
-- name: set the number of master and worker node count
-  shell: python /tmp/config.py install-config "{{ workdir }}/install-config.yml" -master_count {{ OPENSHIFT_INSTALL_MASTER_COUNT }} -worker_count {{ OPENSHIFT_INSTALL_WORKER_COUNT }}
+- name: copy the install config
+  copy:
+    src: /root/install-config.yaml
+    dest: "{{ workdir }}/install-config.yml"
+
+- name: set the cluster name, number of master and worker node count
+  shell: python /tmp/config.py install-config "{{ workdir }}/install-config.yml" -master_count {{ OPENSHIFT_INSTALL_MASTER_COUNT }} -worker_count {{ OPENSHIFT_INSTALL_WORKER_COUNT }} -cluster_name {{ OPENSHIFT_INSTALL_CLUSTER_NAME }}
 
 - name: manifests
-  shell: "source {{ openshift_vars_file }}; cd {{ workdir }}; bin/openshift-install create manifests"
+  shell: "cd {{ workdir }}; bin/openshift-install create manifests"
 
 - name: set the instance type of master nodes
   shell: python /tmp/config.py master_instances "{{ workdir }}/openshift/99_openshift-cluster-api_master-machines.yaml" -master_instance_type {{ OPENSHIFT_INSTALL_MASTER_INSTANCE_FLAVOR }}
@@ -78,7 +79,7 @@
   shell: python /tmp/config.py worker_instances "{{ workdir }}/openshift/99_openshift-cluster-api_worker-machineset.yaml" -worker_instance_type {{ OPENSHIFT_INSTALL_WORKER_INSTANCE_FLAVOR }}
 
 - name: ignition configs
-  shell: "source {{ openshift_vars_file }}; cd {{ workdir }}; bin/openshift-install create ignition-configs"
+  shell: "cd {{ workdir }}; bin/openshift-install create ignition-configs"
 
 - name: set the user in ignition configs
   replace:
@@ -97,12 +98,12 @@
         dest: /root/rhcos-qemu.qcow2.gz
 
     - name: run openshift installer on libvirt
-      shell: "source {{ openshift_vars_file }}; cd {{ workdir }}; bin/openshift-install create cluster --log-level=debug"
+      shell: "cd {{ workdir }}; bin/openshift-install create cluster --log-level=debug"
   when: OPENSHIFT_INSTALL_PLATFORM == "libvirt"
 
 - block:
     - name: run openshift installer on aws
-      shell: "source {{ openshift_vars_file }}; cd {{ workdir }}; bin/openshift-install create cluster --log-level=debug"
+      shell: "cd {{ workdir }}; bin/openshift-install create cluster --log-level=debug"
      
     - name: sleep for sometime for the cluster to settle
       pause:
