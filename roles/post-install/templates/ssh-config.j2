@@ -1,0 +1,8 @@
+Host ip*
+   StrictHostKeyChecking no
+   ProxyCommand ssh -W %h:%p {{ master_public_ip.stdout }}
+   UserKnownHostsFile=/dev/null
+
+Host *
+   UserKnownHostsFile=/dev/null
+   StrictHostKeyChecking no
