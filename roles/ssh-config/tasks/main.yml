@@ -2,24 +2,24 @@
 
 - name: stat config file
   stat:
-    path: /tmp/config
+    path: /tmp/ssh-config
   register: config_status
 
 - name: delete config file
   file:
-    path: /tmp/config
+    path: /tmp/ssh-config
     state: absent
   when: config_status.stat.exists == True
 
 - name: ssh config for nodes
   template:
     src: ssh-config.j2
-    dest: /tmp/config
+    dest: /tmp/ssh-config
   delegate_to: localhost
 
 - name: modify ssh options in ansible
   lineinfile:
     path: /etc/ansible/ansible.cfg
     regexp: '^#ssh_args'
-    line: 'ssh_args = -o "StrictHostKeyChecking=no" -F /tmp/config'
+    line: 'ssh_args = -o "StrictHostKeyChecking=no" -F /tmp/ssh-config'
   delegate_to: localhost

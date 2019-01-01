@@ -38,11 +38,13 @@ def manifests(cfg_type, cfg_path, instance_type):
                yaml.dump(config, f,  default_flow_style=False)
            shutil.move(tmp_master_manifests_file, cfg_path)
         elif cfg_type == "worker_instances":
-           for index, value in enumerate(config):
-               config['items'][index-1]['spec']['template']['spec']['providerConfig']['value']['instanceType'] = instance_type
-           with open(tmp_worker_manifests_file, 'w') as f:
+            items_count = len(config['items'])
+            for index, value in enumerate(config):
+                if index < items_count:
+                    config['items'][index]['spec']['template']['spec']['providerConfig']['value']['instanceType'] = instance_type
+            with open(tmp_worker_manifests_file, 'w') as f:
                yaml.dump(config, f,  default_flow_style=False)
-           shutil.move(tmp_worker_manifests_file, cfg_path)
+            shutil.move(tmp_worker_manifests_file, cfg_path)
         else:
            print ("%s is not a valid config type, please check" %(cfg_type))
 

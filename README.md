@@ -19,6 +19,10 @@ pipeline to work seamlessly. At this point of time, all we need to do is to kick
 $ ansible-playbook -vv -i ocp.inv ocp.yml
 ```
 
+In the post-install phase, the playbook labels a worker node with role controller. This node is dedicated to run the
+scale tests, the playbook ensures that the pbench data is collected from worker nodes which is not a controller node
+for the performance data to be valid.
+
 ### Cleanup
 Set OPENSHIFT_INSTALL to False and OPENSHIFT_AWS_INSTALL_CLEANUP to True in the ocp.inv and run the playbook:
 ```
