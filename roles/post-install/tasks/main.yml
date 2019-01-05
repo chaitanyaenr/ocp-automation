@@ -12,6 +12,10 @@
     path: /root/.kube
     state: directory
 
+    #- name: masters
+    #shell: oc get nodes | grep master | awk '{print $1}'
+    #register: ocp_masters
+
 - name: copy the kubeconfig
   copy:
     src: "{{ workdir }}/auth/kubeconfig"
@@ -45,6 +49,9 @@
   with_items:
     - "node-role.kubernetes.io/controller=true"
     - "role=controller"
+
+- name: add a taint to the controller
+  shell: oc adm taint node {{ controller_node.stdout }} role=controller:NoSchedule
 
 - name: controller node
   debug:

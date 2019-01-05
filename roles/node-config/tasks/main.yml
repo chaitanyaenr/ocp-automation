@@ -2,3 +2,12 @@
 - name: pbench-agent image
   shell: podman pull docker.io/ravielluri/image:agent
 
+- name: ensure that .kube dir exists
+  file:
+    path: /root/.kube
+    state: directory
+
+- name: copy the kubeconfig
+  copy:
+    src: /root/.kube/config
+    dest: /root/.kube/config
