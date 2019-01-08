@@ -20,7 +20,6 @@ networking:
 platform:
   aws:
     region: {{ OPENSHIFT_INSTALL_AWS_REGION }}
-    vpcCIDRBlock: {{ OPENSHIFT_INSTALL_VPC_CIDR_BLOCK }}
 pullSecret: |+
   {{ OPENSHIFT_INSTALL_PULL_SECRET }}
 sshKey: |+

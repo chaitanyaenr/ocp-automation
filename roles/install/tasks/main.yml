@@ -9,6 +9,11 @@
     - git
     - golang-bin
     - gcc-c++
+    - python-pip
+
+- name: Install awscli
+  pip:
+    name: awscli
 
 - name: create gopath dir
   file:
@@ -72,11 +77,11 @@
 - name: manifests
   shell: "cd {{ workdir }}; bin/openshift-install create manifests"
 
-- name: set the instance type of master nodes
-  shell: python /tmp/config.py master_instances "{{ workdir }}/openshift/99_openshift-cluster-api_master-machines.yaml" -master_instance_type {{ OPENSHIFT_INSTALL_MASTER_INSTANCE_FLAVOR }}
+  #- name: set the instance type of master nodes
+  #shell: python /tmp/config.py master_instances "{{ workdir }}/openshift/99_openshift-cluster-api_master-machines.yaml" -master_instance_type {{ OPENSHIFT_INSTALL_MASTER_INSTANCE_FLAVOR }}
 
-- name: set the instance type of worker nodes
-  shell: python /tmp/config.py worker_instances "{{ workdir }}/openshift/99_openshift-cluster-api_worker-machineset.yaml" -worker_instance_type {{ OPENSHIFT_INSTALL_WORKER_INSTANCE_FLAVOR }}
+  #- name: set the instance type of worker nodes
+  #shell: python /tmp/config.py worker_instances "{{ workdir }}/openshift/99_openshift-cluster-api_worker-machineset.yaml" -worker_instance_type {{ OPENSHIFT_INSTALL_WORKER_INSTANCE_FLAVOR }}
 
 - name: ignition configs
   shell: "cd {{ workdir }}; bin/openshift-install create ignition-configs"

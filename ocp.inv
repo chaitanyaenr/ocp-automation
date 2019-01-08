@@ -36,3 +36,8 @@ OPENSHIFT_INSTALL_LIBVIRT_IMAGE='file:///root/rhcos-qemu.qcow2.gz'
 # Cleanup
 OPENSHIFT_LIBVIRT_INSTALL_CLEANUP=False
 OPENSHIFT_AWS_INSTALL_CLEANUP=True
+
+#Post install
+poll_attempts: "{{ lookup('env', 'POLL_ATTEMPTS')|default(600, true) }}"
+rhcos_infra_node_instance_type: "{{ lookup('env', 'RHCOS_INFRA_NODE_INSTANCE_TYPE')|default('m5.10xlarge', true) }}"
+rhcos_pbench_node_instance_type: "{{ lookup('env', 'RHCOS_PBENCH_NODE_INSTANCE_TYPE')|default('m5.4xlarge', true) }}"

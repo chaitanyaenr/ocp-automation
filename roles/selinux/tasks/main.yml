@@ -15,7 +15,7 @@
     - selinux_patch3.pp
 
 - name: load selinux modules
-  shell: selinux -i "{{ item }}"
+  shell: semmodule -i "{{ item }}"
   with_items:
     - /tmp/selinux_patch1.pp
     - /tmp/selinux_patch2.pp
