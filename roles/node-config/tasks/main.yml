@@ -11,3 +11,9 @@
   copy:
     src: /root/.kube/config
     dest: /root/.kube/config
+
+- name: copy perf private key
+  copy:
+    src: /root/.ssh/id_rsa
+    dest: /root/.ssh/id_rsa
+    mode: 0600

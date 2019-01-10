@@ -34,6 +34,17 @@
     version: containerozed_tooling
   when: svt.stat.exists == False
 
+- name: create clusterloader dir
+  file:
+    path: /usr/libexec/atomic-openshift/
+    state: directory
+
+- name: copy clusterloader binary
+  copy:
+    src: /usr/bin/openshift-test
+    dest: /usr/libexec/atomic-openshift/extended.test
+    mode: 0755
+
 - name: pick one master node
   shell: oc get nodes -l node-role.kubernetes.io/master | awk 'NR>1 {print $1}' | tail -n1
   register: master_node
@@ -97,10 +108,6 @@
 - name: Disable CVO to prevent squashed configuration changes to cluster operators
   shell: |
     oc scale --replicas 0 -n openshift-cluster-version deployments/cluster-version-operator
-
-- name: Taint the pbench controller node
-  shell: |
-    oc adm taint node -l node-role.kubernetes.io/pbench= dedicated=pbench:NoSchedule
 
 - name: Copy new cluster-monitoring-config
   copy:
