@@ -69,10 +69,10 @@
 - name: setup install-config
   template:
      src: install-config.yaml.j2
-     dest: "{{ workdir }}/install-config.yml"
+     dest: "{{ workdir }}/install-config.yaml"
 
 - name: set the cluster name, number of master and worker node count
-  shell: python /tmp/config.py install-config "{{ workdir }}/install-config.yml" -master_count {{ OPENSHIFT_INSTALL_MASTER_COUNT }} -worker_count {{ OPENSHIFT_INSTALL_WORKER_COUNT }} -cluster_name {{ OPENSHIFT_INSTALL_CLUSTER_NAME }}
+  shell: python /tmp/config.py install-config "{{ workdir }}/install-config.yaml" -master_count {{ OPENSHIFT_INSTALL_MASTER_COUNT }} -worker_count {{ OPENSHIFT_INSTALL_WORKER_COUNT }} -cluster_name {{ OPENSHIFT_INSTALL_CLUSTER_NAME }}
 
 - name: manifests
   shell: "cd {{ workdir }}; bin/openshift-install create manifests"
