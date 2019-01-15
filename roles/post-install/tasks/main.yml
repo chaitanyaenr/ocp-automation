@@ -49,104 +49,6 @@
   shell: oc get nodes -l node-role.kubernetes.io/master | awk 'NR>1 {print $1}' | tail -n1
   register: master_node
 
-- name: Get cluster name
-  shell: |
-    {%raw%}oc get machineset -n openshift-cluster-api -o=go-template='{{(index (index .items 0).metadata.labels "sigs.k8s.io/cluster-api-cluster")}}'{%endraw%}
-  register: rhcos_cluster_name
-
-- name: Get cluster ID
-  shell: |
-    {%raw%}oc get machineset -n openshift-cluster-api -o=go-template='{{with (index .items 0)}}{{range .spec.template.spec.providerSpec.value.tags}}{{if eq .name "openshiftClusterID"}}{{.value}}{{end}}{{end}}{{end}}'{%endraw%}
-  register: rhcos_cluster_id
-
-- name: Get AMI ID
-  shell: |
-    {%raw%}oc get machineset -n openshift-cluster-api -o=go-template='{{(index .items 0).spec.template.spec.providerSpec.value.ami.id}}'{%endraw%}
-  register: rhcos_ami_id
-
-- name: Get cluster region
-  shell: |
-    {%raw%}oc get machineset -n openshift-cluster-api -o=go-template='{{(index .items 0).spec.template.spec.providerSpec.value.placement.region}}'{%endraw%}
-  register: rhcos_region
-
-- name: Place machineset yamls on master
-  template:
-    src: "{{item.src}}"
-    dest: "{{item.dest}}"
-  with_items:
-    - src: templates/infra-node-machineset.yml.j2
-      dest: infra-node-machineset.yml
-    - src: templates/pbench-node-machineset.yml.j2
-      dest: pbench-node-machineset.yml
-
-- name: Get current ready node count
-  shell: oc get nodes | grep " Ready" -ic
-  register: rhcos_current_node_count
-
-- name: Create machinesets
-  shell: |
-    oc create -f infra-node-machineset.yml,pbench-node-machineset.yml
-
-- name: Poll nodes to see if creating nodes finished
-  shell: oc get nodes | grep " Ready" -ic
-  register: current_node_count
-   # + 3 (infra nodes) + 1 (pbench controller node)
-  until: current_node_count.stdout|int == (rhcos_current_node_count.stdout|int + 3 + 1)
-  delay: 1
-  retries: "{{poll_attempts|int}}"
-
-- name: Relabel the infra nodes
-  shell: |
-    oc label nodes --overwrite -l 'node-role.kubernetes.io/infra=' node-role.kubernetes.io/worker-
-  # oc label nodes --overwrite -l 'beta.kubernetes.io/instance-type={{rhcos_infra_node_instance_type}}' node-role.kubernetes.io/worker- node-role.kubernetes.io/infra=""
-
-- name: Relabel the pbench controller node
-  shell: |
-    oc label nodes --overwrite -l 'node-role.kubernetes.io/pbench=' node-role.kubernetes.io/worker-
-  # oc label nodes --overwrite -l 'beta.kubernetes.io/instance-type={{rhcos_pbench_node_instance_type}}' node-role.kubernetes.io/worker- node-role.kubernetes.io/pbench=""
-
-- name: Disable CVO to prevent squashed configuration changes to cluster operators
-  shell: |
-    oc scale --replicas 0 -n openshift-cluster-version deployments/cluster-version-operator
-
-- name: Copy new cluster-monitoring-config
-  copy:
-    src: files/cluster-monitoring-config.yml
-    dest: cluster-monitoring-config.yml
-
-- name: Replace the cluster-monitoring-config ConfigMap
-  shell: |
-    oc replace -f cluster-monitoring-config.yml
-
-# Ingress comes with a nodeSelector for worker nodes
-- name: Remove existing nodeSelector from ingress
-  shell: |
-    oc patch deployment.apps/router-default -n openshift-ingress --type json -p '[{"op": "remove", "path": "/spec/template/spec/nodeSelector"}]'
-
-- name: Apply new node-selector to infra workload components
-  shell: |
-    oc patch {{item.object}} -n {{item.namespace}} -p '{"spec": {"template": {"spec": {"nodeSelector": {"node-role.kubernetes.io/infra": ""}}}}}'
-  with_items:
-    # Monitoring
-    - namespace: openshift-monitoring
-      object: deployment.apps/cluster-monitoring-operator
-    - namespace: openshift-monitoring
-      object: deployment.apps/prometheus-adapter
-    # Registry
-    - namespace: openshift-image-registry
-      object: deployment.apps/cluster-image-registry-operator
-    - namespace: openshift-image-registry
-      object: deployment.apps/image-registry
-    # Ingress (Router)
-    - namespace: openshift-ingress-operator
-      object: deployment.apps/ingress-operator
-    - namespace: openshift-ingress
-      object: deployment.apps/router-default
-
-- name: Relabel the pbench controller node
-  shell: |
-    oc label nodes --overwrite -l 'beta.kubernetes.io/instance-type={{rhcos_pbench_node_instance_type}}' node-role.kubernetes.io/worker- node-role.kubernetes.io/pbench=""
-
 - name: get the controller node
   shell: oc get nodes -l node-role.kubernetes.io/pbench="" | awk 'NR>1 {print $1}' | tail -n1
   register: controller_node
@@ -155,6 +57,9 @@
   shell: oc label node {{ controller_node.stdout }} {{ item }} --overwrite=true
   with_items:
     - "role=controller"
+
+- name: remove the existing taint
+  shell: oc adm taint node {{ controller_node.stdout }} dedicated-
 
 - name: add a taint to the controller
   shell: oc adm taint node {{ controller_node.stdout }} role=controller:NoSchedule
