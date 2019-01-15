@@ -103,13 +103,23 @@
         dest: /root/rhcos-qemu.qcow2.gz
 
     - name: run openshift installer on libvirt
+      shell: "cd {{ workdir }}; export OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE={{ OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE }}; bin/openshift-install create cluster --log-level=debug"
+      when: (OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE is defined) and (OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE != "")     
+
+    - name: run openshift installer on libvirt
       shell: "cd {{ workdir }}; bin/openshift-install create cluster --log-level=debug"
+      when: (OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE is undefined) or (OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE == "")
   when: OPENSHIFT_INSTALL_PLATFORM == "libvirt"
 
 - block:
     - name: run openshift installer on aws
-      shell: "cd {{ workdir }}; bin/openshift-install create cluster --log-level=debug"
-     
+      shell: "cd {{ workdir }}; export OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE={{ OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE }}; bin/openshift-install create cluster --log-level=debug"
+      when: (OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE is defined) and (OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE != "") 
+
+    - name: run openshift installer on aws
+      shell: "cd {{ workdir }}; export OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE={{ OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE }}; bin/openshift-install create cluster --log-level=debug"
+      when: (OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE is undefined) or (OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE == "")
+
     - name: sleep for sometime for the cluster to settle
       pause:
         minutes: 3

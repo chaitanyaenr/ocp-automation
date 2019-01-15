@@ -6,6 +6,7 @@
     - { role: cleanup, when: (OPENSHIFT_AWS_INSTALL_CLEANUP | default(False) | bool) or (OPENSHIFT_LIBVIRT_INSTALL_CLEANUP | default(False) | bool) }
     - { role: install, when: OPENSHIFT_INSTALL | default(True) | bool }
     - { role: quickstart, when: OPENSHIFT_INSTALL | default(True) | bool }
+    - { role: rhcos-post-install, when: OPENSHIFT_INSTALL | default(True) | bool }
     - { role: post-install, when: OPENSHIFT_INSTALL | default(False) | bool }
      
 - hosts: controller
