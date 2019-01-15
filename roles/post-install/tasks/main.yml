@@ -7,44 +7,6 @@
   set_fact:
     openshift_vars_file: "{{ansible_env.HOME}}/ocp-env.sh"
 
-- name: ensure that .kube dir exists
-  file:
-    path: /root/.kube
-    state: directory
-
-    #- name: masters
-    #shell: oc get nodes | grep master | awk '{print $1}'
-    #register: ocp_masters
-
-- name: copy the kubeconfig
-  copy:
-    src: "{{ workdir }}/auth/kubeconfig"
-    dest: /root/.kube/config
-
-- name: stat svt repo
-  stat:
-    path: /root/svt
-  register: svt
-
-- name: clone svt repo
-  git:
-    repo: https://github.com/openshift/svt
-    dest: /root/svt
-    update: yes
-    version: containerozed_tooling
-  when: svt.stat.exists == False
-
-- name: create clusterloader dir
-  file:
-    path: /usr/libexec/atomic-openshift/
-    state: directory
-
-- name: copy clusterloader binary
-  copy:
-    src: /usr/bin/openshift-test
-    dest: /usr/libexec/atomic-openshift/extended.test
-    mode: 0755
-
 - name: pick one master node
   shell: oc get nodes -l node-role.kubernetes.io/master | awk 'NR>1 {print $1}' | tail -n1
   register: master_node
@@ -60,6 +22,7 @@
 
 - name: remove the existing taint
   shell: oc adm taint node {{ controller_node.stdout }} dedicated-
+  ignore_errors: yes
 
 - name: add a taint to the controller
   shell: oc adm taint node {{ controller_node.stdout }} role=controller:NoSchedule
