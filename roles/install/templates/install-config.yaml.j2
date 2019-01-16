@@ -2,10 +2,10 @@ apiVersion: v1beta1
 baseDomain: {{ OPENSHIFT_INSTALL_BASE_DOMAIN }}
 machines:
 - name: master
-  platform: {}
+  platform: {"aws":{"type": "{{ OPENSHIFT_INSTALL_MASTER_INSTANCE_FLAVOR }}"}}
   replicas: 3
 - name: worker
-  platform: {}
+  platform: {"aws":{"type": "{{ OPENSHIFT_INSTALL_WORKER_INSTANCE_FLAVOR }}"}}
   replicas: 3
 metadata:
   creationTimestamp: null

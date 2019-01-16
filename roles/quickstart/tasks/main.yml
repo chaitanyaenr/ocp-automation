@@ -26,21 +26,31 @@
     path: /root/svt
   register: svt
 
+- name: delete svt repo if exists
+  file:
+    path: /root/svt
+    state: absent
+  when: svt.stat.exists == True
+
 - name: clone svt repo
   git:
-    repo: https://github.com/openshift/svt
+    repo: https://github.com/chaitanyaenr/svt
     dest: /root/svt
     update: yes
     version: containerozed_tooling
-  when: svt.stat.exists == False
 
 - name: create clusterloader dir
   file:
     path: /usr/libexec/atomic-openshift/
     state: directory
 
-- name: copy clusterloader binary
-  copy:
-    src: /usr/bin/openshift-tests
-    dest: /usr/libexec/atomic-openshift/extended.test
-    mode: 0755
+    #- name: pull down clusterloader binary
+    #get_url:
+    #url: "{{ CLUSTERLOADER_URL }}"
+    #dest: /usr/libexec/atomic-openshift/
+    #mode: 0755
+    #- name: copy clusterloader binary
+    #copy:
+    #src: /usr/bin/openshift-tests
+    #dest: /usr/libexec/atomic-openshift/extended.test
+    #mode: 0755
