@@ -7,19 +7,19 @@
     - { role: install, when: OPENSHIFT_INSTALL | default(True) | bool }
     - { role: quickstart, when: OPENSHIFT_INSTALL | default(True) | bool }
     - { role: rhcos-post-install, when: OPENSHIFT_INSTALL | default(True) | bool }
-    - { role: post-install, when: OPENSHIFT_INSTALL | default(False) | bool }
+    - { role: post-install, when: OPENSHIFT_INSTALL | default(True) | bool }
      
 - hosts: controller
   user: root
   roles:
-    - { role: controller-kickstart, when: OPENSHIFT_INSTALL | default(False) | bool }
+    - { role: controller-kickstart, when: OPENSHIFT_INSTALL | default(True) | bool }
     - { role: disable-selinux, when: (OPENSHIFT_INSTALL | default(False) | bool) and (DISABLE_SELINUX | default(False) | bool) }
-    - { role: node-config, when: OPENSHIFT_INSTALL | default(False) | bool }
+    - { role: node-config, when: OPENSHIFT_INSTALL | default(True) | bool }
       #    - { role: ssh-config, when: OPENSHIFT_INSTALL | default(False) | bool }
 
 - hosts: nodes
   user: root
   roles:
-    - { role: node-config, when: OPENSHIFT_INSTALL | default(False) | bool }
-    - { role: selinux, when: OPENSHIFT_INSTALL | default(False) | bool }
+    - { role: node-config, when: OPENSHIFT_INSTALL | default(True) | bool }
+    - { role: selinux, when: OPENSHIFT_INSTALL | default(True) | bool }
     - { role: disable-selinux, when: (OPENSHIFT_INSTALL | default(False) | bool) and (DISABLE_SELINUX | default(False) | bool) }
