@@ -23,6 +23,7 @@ OPENSHIFT_INSTALL_SERVICE_CIDR=
 OPENSHIFT_INSTALL_MACHINE_CIDR=
 OPENSHIFT_INSTALL_VPC_CIDR_BLOCK=
 OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE=
+OPENSHIFT_INSTALL_LOG_DIR=/root/ocp
 ansible_ssh_private_key_file=/root/.ssh/id_rsa_perf"
 # AWS cluster vars
 AWS_PROFILE=
@@ -35,9 +36,9 @@ OPENSHIFT_INSTALL_LIBVIRT_URI="qemu+tcp://192.168.122.1/system"
 OPENSHIFT_INSTALL_LIBVIRT_IMAGE='file:///root/rhcos-qemu.qcow2.gz'
 # Cleanup
 OPENSHIFT_LIBVIRT_INSTALL_CLEANUP=False
-OPENSHIFT_AWS_INSTALL_CLEANUP=True
+OPENSHIFT_AWS_INSTALL_CLEANUP=False
 
 #Post install
 poll_attempts: "{{ lookup('env', 'POLL_ATTEMPTS')|default(600, true) }}"
-rhcos_infra_node_instance_type: "{{ lookup('env', 'RHCOS_INFRA_NODE_INSTANCE_TYPE')|default('m5.10xlarge', true) }}"
-rhcos_pbench_node_instance_type: "{{ lookup('env', 'RHCOS_PBENCH_NODE_INSTANCE_TYPE')|default('m5.4xlarge', true) }}"
+rhcos_infra_node_instance_type: "{{ lookup('env', 'RHCOS_INFRA_NODE_INSTANCE_TYPE')|default('m5.xlarge', true) }}"
+rhcos_pbench_node_instance_type: "{{ lookup('env', 'RHCOS_PBENCH_NODE_INSTANCE_TYPE')|default('m5.xlarge', true) }}"
