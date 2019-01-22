@@ -4,16 +4,16 @@
 
 - name: ensure that .kube dir exists
   file:
-    path: /root/.kube
+    path: /home/core/.kube
     state: directory
 
 - name: copy the kubeconfig
   copy:
     src: /root/.kube/config
-    dest: /root/.kube/config
+    dest: /home/core/.kube/config
 
 - name: copy perf private key
   copy:
     src: /root/.ssh/id_rsa
-    dest: /root/.ssh/id_rsa
+    dest: /home/core/.ssh/id_rsa
     mode: 0600

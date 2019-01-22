@@ -10,15 +10,15 @@
     - { role: post-install, when: OPENSHIFT_INSTALL | default(True) | bool }
      
 - hosts: controller
-  user: root
+  remote_user: core
   roles:
     - { role: controller-kickstart, when: OPENSHIFT_INSTALL | default(True) | bool }
     - { role: disable-selinux, when: (OPENSHIFT_INSTALL | default(False) | bool) and (DISABLE_SELINUX | default(False) | bool) }
     - { role: node-config, when: OPENSHIFT_INSTALL | default(True) | bool }
-      #    - { role: ssh-config, when: OPENSHIFT_INSTALL | default(False) | bool }
+    #- { role: ssh-config, when: OPENSHIFT_INSTALL | default(False) | bool }
 
 - hosts: nodes
-  user: root
+  remote_user: core
   roles:
     - { role: node-config, when: OPENSHIFT_INSTALL | default(True) | bool }
     - { role: selinux, when: OPENSHIFT_INSTALL | default(True) | bool }
