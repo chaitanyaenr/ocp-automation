@@ -11,6 +11,7 @@
      
 - hosts: controller
   remote_user: core
+  become: yes 
   roles:
     - { role: controller-kickstart, when: OPENSHIFT_INSTALL | default(True) | bool }
     - { role: disable-selinux, when: (OPENSHIFT_INSTALL | default(False) | bool) and (DISABLE_SELINUX | default(False) | bool) }
@@ -19,6 +20,7 @@
 
 - hosts: nodes
   remote_user: core
+  become: yes
   roles:
     - { role: node-config, when: OPENSHIFT_INSTALL | default(True) | bool }
     - { role: selinux, when: OPENSHIFT_INSTALL | default(True) | bool }

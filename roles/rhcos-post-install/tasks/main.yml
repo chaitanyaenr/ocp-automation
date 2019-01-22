@@ -69,6 +69,7 @@
 - name: Replace the cluster-monitoring-config ConfigMap
   shell: |
     oc replace -f cluster-monitoring-config.yml
+  ignore_errors: yes
 
 - name: Remove existing nodeSelector from monitoring
   shell: |
