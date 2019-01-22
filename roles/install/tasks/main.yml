@@ -78,8 +78,8 @@
 - name: set the cluster name, number of master and worker node count
   shell: python /tmp/config.py install-config "{{ workdir }}/install-config.yaml" -master_count {{ OPENSHIFT_INSTALL_MASTER_COUNT }} -worker_count {{ OPENSHIFT_INSTALL_WORKER_COUNT }} -cluster_name {{ OPENSHIFT_INSTALL_CLUSTER_NAME }}
 
-- name: manifests
-  shell: "cd {{ workdir }}; bin/openshift-install create manifests"
+  #- name: manifests
+  #shell: "cd {{ workdir }}; bin/openshift-install create manifests"
 
   #- name: set the instance type of master nodes
   #shell: python /tmp/config.py master_instances "{{ workdir }}/openshift/99_openshift-cluster-api_master-machines.yaml" -master_instance_type {{ OPENSHIFT_INSTALL_MASTER_INSTANCE_FLAVOR }}
@@ -112,7 +112,7 @@
         dest: /root/rhcos-qemu.qcow2.gz
 
     - name: run openshift installer on libvirt
-      shell: "cd {{ workdir }}; export OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE={{ OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE }}; bin/openshift-install create cluster --log-level=debug 2>&1 | tee -a {{ OPENSHIFT_INSTALL_LOG_DIR }}/install.log"
+      shell: "cd {{ workdir }}; export OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE={{ OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE }}; export _OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE={{ OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE }}; bin/openshift-install create cluster --log-level=debug 2>&1 | tee -a {{ OPENSHIFT_INSTALL_LOG_DIR }}/install.log"
       when: (OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE is defined) and (OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE != "")     
 
     - name: run openshift installer on libvirt
@@ -122,7 +122,7 @@
 
 - block:
     - name: run openshift installer on aws
-      shell: "cd {{ workdir }}; export OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE={{ OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE }}; bin/openshift-install create cluster --log-level=debug 2>&1 | tee -a {{ OPENSHIFT_INSTALL_LOG_DIR }}/install.log"
+      shell: "cd {{ workdir }}; export OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE={{ OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE }}; export _OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE={{ OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE }}; bin/openshift-install create cluster --log-level=debug 2>&1 | tee -a {{ OPENSHIFT_INSTALL_LOG_DIR }}/install.log"
       when: (OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE is defined) and (OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE != "") 
 
     - name: run openshift installer on aws

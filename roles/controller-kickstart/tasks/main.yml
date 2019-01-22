@@ -5,31 +5,62 @@
 
 - name: ensure that .kube dir exists on controller
   file:
-    path: /home/core/.kube
+    path: "{{ item }}"
     state: directory
-
+  with_items:
+    - /home/core/.kube
+    - /root/.kube
+ 
 - name: copy the kubeconfig to controller node
   copy:
     src: "{{ workdir }}/auth/kubeconfig"
-    dest: /home/core/.kube/config
+    dest: "{{ item }}"
+  with_items:
+    - /home/core/.kube/config
+    - /root/.kube/config
+
+- name: ensure that ssh dir exists
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - /home/core/.ssh
+    - /root/.ssh
+
+- name: copy authorized keys
+  copy:
+    src: /home/core/.ssh/authorized_keys
+    dest: /root/.ssh/authorized_keys
+    remote_src: yes
+    owner: root
+    group: root
 
 - name: copy perf private key to controller host
   copy:
     src: /root/.ssh/id_rsa
-    dest: /home/core/.ssh/id_rsa
+    dest: "{{ item }}"
     mode: 0600
+  with_items:
+    - /home/core/.ssh/id_rsa
+    - /root/.ssh/id_rsa
 
 - name: copy ssh config
   copy:
     src: config
-    dest: /home/core/.ssh/config
+    dest: "{{ item }}"
     mode: 0600
+  with_items:
+    - /home/core/.ssh/config
+    - /root/.ssh/config
 
 - name: copy clusterloader binary
   copy:
     src: /usr/libexec/atomic-openshift/extended.test
-    dest: /home/core/extended.test
+    dest: "{{ item }}"
     mode: 0755
+  with_items:
+    - /home/core/extended.test
+    - /root/extended.test
 
 - name: check if cluster loader binary exists
   stat:

@@ -2,10 +2,22 @@ apiVersion: v1beta1
 baseDomain: {{ OPENSHIFT_INSTALL_BASE_DOMAIN }}
 machines:
 - name: master
-  platform: {"aws":{"type": "{{ OPENSHIFT_INSTALL_MASTER_INSTANCE_FLAVOR }}"}}
+  platform:
+   aws:
+     type: {{ OPENSHIFT_INSTALL_MASTER_INSTANCE_FLAVOR }}
+     rootVolume:
+       iops: {{ OPENSHIFT_INSTALL_MASTER_VOLUME_IOPS }}
+       size: {{ OPENSHIFT_INSTALL_MASTER_ROOT_VOLUME_SIZE }}
+       type: {{ OPENSHIFT_INSTALL_MASTER_ROOT_VOLUME_TYPE }}
   replicas: 3
 - name: worker
-  platform: {"aws":{"type": "{{ OPENSHIFT_INSTALL_WORKER_INSTANCE_FLAVOR }}"}}
+  platform:
+   aws:
+     type: {{ OPENSHIFT_INSTALL_WORKER_INSTANCE_FLAVOR }}
+     rootVolume:
+       iops: {{ OPENSHIFT_INSTALL_WORKER_VOLUME_IOPS }}
+       size: {{ OPENSHIFT_INSTALL_WORKER_ROOT_VOLUME_SIZE }}
+       type: {{ OPENSHIFT_INSTALL_WORKER_ROOT_VOLUME_TYPE }}
   replicas: 3
 metadata:
   creationTimestamp: null

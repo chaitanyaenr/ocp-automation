@@ -4,16 +4,41 @@
 
 - name: ensure that .kube dir exists
   file:
-    path: /home/core/.kube
+    path: "{{ item }}"
     state: directory
+  with_items:
+    - /home/core/.kube
+    - /root/.kube
 
 - name: copy the kubeconfig
   copy:
     src: /root/.kube/config
-    dest: /home/core/.kube/config
+    dest: "{{ item }}"
+  with_items:
+    - /home/core/.kube/config
+    - /root/.kube/config
+
+- name: ensure that ssh dir exists
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - /home/core/.ssh
+    - /root/.ssh
+
+- name: copy authorized keys
+  copy:
+    src: /home/core/.ssh/authorized_keys
+    dest: /root/.ssh/authorized_keys
+    remote_src: yes
+    owner: root
+    group: root
 
 - name: copy perf private key
   copy:
     src: /root/.ssh/id_rsa
-    dest: /home/core/.ssh/id_rsa
+    dest: "{{ item }}"
     mode: 0600
+  with_items:
+    - /root/.ssh/id_rsa
+    - /home/core/.ssh/id_rsa
