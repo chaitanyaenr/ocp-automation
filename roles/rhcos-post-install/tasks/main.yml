@@ -24,10 +24,10 @@
     src: "{{item.src}}"
     dest: "{{item.dest}}"
   with_items:
-     - src: templates/infra-node-machineset.yml.j2
-       dest: infra-node-machineset.yml
-     - src: templates/pbench-node-machineset.yml.j2
-       dest: pbench-node-machineset.yml
+     - src: infra-node-machineset.yml.j2
+       dest: /root/infra-node-machineset.yml
+     - src: pbench-node-machineset.yml.j2
+       dest: /root/pbench-node-machineset.yml
 
 - name: Get current ready node count
   shell: oc get nodes | grep " Ready" -ic
@@ -63,12 +63,12 @@
 
 - name: Copy new cluster-monitoring-config
   copy:
-    src: files/cluster-monitoring-config.yml
-    dest: cluster-monitoring-config.yml
+    src: cluster-monitoring-config.yml
+    dest: /root/cluster-monitoring-config.yml
 
 - name: Replace the cluster-monitoring-config ConfigMap
   shell: |
-    oc replace -f cluster-monitoring-config.yml
+    oc create -f cluster-monitoring-config.yml
   ignore_errors: yes
 
 - name: Remove existing nodeSelector from monitoring
