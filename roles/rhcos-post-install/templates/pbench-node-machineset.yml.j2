@@ -36,13 +36,18 @@ items:
               filters: null
               id: {{rhcos_ami_id.stdout}}
             apiVersion: awsproviderconfig.k8s.io/v1alpha1
+            blockDevices:
+            - ebs:
+                iops: {{RHCOS_PBENCH_NODE_VOLUME_IOPS}}
+                volumeSize: {{RHCOS_PBENCH_NODE_VOLUME_SIZE}}
+                volumeType: {{RHCOS_PBENCH_NODE_VOLUME_TYPE}}
             credentialsSecret: null
             deviceIndex: 0
             iamInstanceProfile:
               arn: null
               filters: null
               id: {{rhcos_cluster_name.stdout}}-worker-profile
-            instanceType: {{rhcos_pbench_node_instance_type}}
+            instanceType: {{RHCOS_PBENCH_NODE_INSTANCE_TYPE}}
             keyName: null
             kind: AWSMachineProviderConfig
             loadBalancers: null
