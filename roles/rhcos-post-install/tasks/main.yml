@@ -43,7 +43,7 @@
   # + 3 (infra nodes) + 1 (pbench controller node)
   until: current_node_count.stdout|int == (rhcos_current_node_count.stdout|int + 3 + 1)
   delay: 1
-  retries: "{{poll_attempts|int}}"
+  retries: "{{POLL_ATTEMPTS|int}}"
 
 - name: Relabel the infra nodes
   shell: |
