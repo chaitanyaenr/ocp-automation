@@ -34,12 +34,11 @@
     path: /tmp/ocp-env.sh
     state: absent
 
-- name: get the installer and its dependencies
-  shell: go get "{{ item }}"
-  with_items:
-    - github.com/openshift/installer/data
-  environment:
-     GOPATH: "{{ GOPATH }}"
+- name: get the installer bits
+  git:
+    repo: 'https://github.com/openshift/installer.git'
+    dest: "{{ workdir }}"
+    version: "{{ OPENSHIFT_INSTALL_INSTALLER_VERSION }}"
 
 - name: create .aws dir
   file:
@@ -60,10 +59,6 @@
   shell: cd {{ workdir }}; hack/build.sh
   environment:
      GOPATH: "{{ GOPATH }}"
-
-# TMP FIX till all the fixes land in the installer
-#- name: copy the patched binary
-#  shell: cp /root/openshift-install "{{ workdir }}/bin/"
 
 - name: copy the config script to /tmp
   copy:
