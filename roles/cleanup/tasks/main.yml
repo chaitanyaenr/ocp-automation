@@ -23,5 +23,8 @@
 
 - name: cleanup workdir
   file:
-    path: "{{ workdir }}"
+    path: "{{ item }}"
     state: absent
+  with_items:
+    - workdir
+    - OPENSHIFT_INSTALL_LOG_DIR
