@@ -4,7 +4,7 @@ Playbooks to install and configure OpenShift on rhcos.
 ### Prepare the Jump host
 - The jump host is the node which orchestrates the ocp install and configures the nodes to support the automation pipeline.
 - Jump host needs to be a RHEL box and preferred if it is based out of the AMI or QCOW image built by the image provisioner.
-- Obtain the pull secret from coreos.com
+- Ensure that the jump host has the extended.test binary under /usr/libexec/atomic-openshift dir.
 
 ### Run
 Clone the github repo:
@@ -31,10 +31,14 @@ $ ansible-playbook -vv -i ocp.inv ocp.yml
 
 ### Layout
 ```
+.
 ├── ocp.inv
 ├── ocp.yml
 ├── README.md
 └── roles
+    ├── ansible-config
+    │   └── tasks
+    │       └── main.yml
     ├── cleanup
     │   ├── files
     │   │   └── cleanup.sh
@@ -45,17 +49,46 @@ $ ansible-playbook -vv -i ocp.inv ocp.yml
     │   │   └── config
     │   └── tasks
     │       └── main.yml
+    ├── disable-selinux
+    │   └── tasks
+    │       └── main.yml
     ├── install
     │   ├── files
     │   │   └── config.py
     │   ├── tasks
     │   │   └── main.yml
     │   └── templates
+    │       ├── config.j2
+    │       ├── credentials.j2
+    │       ├── install-config.yaml.j2
     │       └── ocp-aws-env.sh.j2
     ├── node-config
     │   └── tasks
     │       └── main.yml
     ├── post-install
+    │   ├── files
+    │   │   └── cluster-monitoring-config.yml
+    │   ├── tasks
+    │   │   ├── bak
+    │   │   └── main.yml
+    │   └── templates
+    │       └── ssh-config.j2
+    ├── quickstart
+    │   └── tasks
+    │       └── main.yml
+    ├── rhcos-post-install
+    │   ├── files
+    │   │   └── cluster-monitoring-config.yml
+    │   ├── tasks
+    │   │   └── main.yml
+    │   └── templates
+    │       ├── infra-node-machineset.yml.j2
+    │       └── pbench-node-machineset.yml.j2
+    ├── selinux
+    │   ├── files
+    │   │   ├── selinux_patch1.pp
+    │   │   ├── selinux_patch2.pp
+    │   │   └── selinux_patch3.pp
     │   └── tasks
     │       └── main.yml
     └── ssh-config
