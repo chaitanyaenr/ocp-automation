@@ -1,22 +1,22 @@
 ---
 - name: Get cluster name
   shell: |
-    {%raw%}oc get machineset -n openshift-cluster-api -o=go-template='{{(index (index .items 0).metadata.labels "sigs.k8s.io/cluster-api-cluster")}}'{%endraw%}
+    {%raw%}oc get machineset -n openshift-machine-api -o=go-template='{{(index (index .items 0).metadata.labels "sigs.k8s.io/cluster-api-cluster")}}'{%endraw%}
   register: rhcos_cluster_name
 
 - name: Get cluster ID
   shell: |
-    {%raw%}oc get machineset -n openshift-cluster-api -o=go-template='{{with (index .items 0)}}{{range .spec.template.spec.providerSpec.value.tags}}{{if eq .name "openshiftClusterID"}}{{.value}}{{end}}{{end}}{{end}}'{%endraw%}
+    {%raw%}oc get machineset -n openshift-machine-api -o=go-template='{{with (index .items 0)}}{{range .spec.template.spec.providerSpec.value.tags}}{{if eq .name "openshiftClusterID"}}{{.value}}{{end}}{{end}}{{end}}'{%endraw%}
   register: rhcos_cluster_id
 
 - name: Get AMI ID
   shell: |
-    {%raw%}oc get machineset -n openshift-cluster-api -o=go-template='{{(index .items 0).spec.template.spec.providerSpec.value.ami.id}}'{%endraw%}
+    {%raw%}oc get machineset -n openshift-machine-api -o=go-template='{{(index .items 0).spec.template.spec.providerSpec.value.ami.id}}'{%endraw%}
   register: rhcos_ami_id
 
 - name: Get cluster region
   shell: |
-    {%raw%}oc get machineset -n openshift-cluster-api -o=go-template='{{(index .items 0).spec.template.spec.providerSpec.value.placement.region}}'{%endraw%}
+    {%raw%}oc get machineset -n openshift-machine-api -o=go-template='{{(index .items 0).spec.template.spec.providerSpec.value.placement.region}}'{%endraw%}
   register: rhcos_region
 
 - name: Place machineset yamls on master

@@ -1,6 +1,6 @@
 apiVersion: v1
 items:
-- apiVersion: cluster.k8s.io/v1alpha1
+- apiVersion: machine.openshift.io/v1beta1
   kind: MachineSet
   metadata:
     creationTimestamp: null
@@ -9,7 +9,7 @@ items:
       sigs.k8s.io/cluster-api-machine-role: infra
       sigs.k8s.io/cluster-api-machine-type: infra
     name: {{rhcos_cluster_name.stdout}}-infra-{{rhcos_region.stdout}}a
-    namespace: openshift-cluster-api
+    namespace: openshift-machine-api
   spec:
     replicas: 1
     selector:
@@ -32,25 +32,18 @@ items:
         providerSpec:
           value:
             ami:
-              arn: null
-              filters: null
               id: {{rhcos_ami_id.stdout}}
-            apiVersion: awsproviderconfig.k8s.io/v1alpha1
+            apiVersion: awsproviderconfig.openshift.io/v1beta1
             blockDevices:
             - ebs:
                 iops: {{RHCOS_INFRA_NODE_VOLUME_IOPS}}
                 volumeSize: {{RHCOS_INFRA_NODE_VOLUME_SIZE}}
                 volumeType: {{RHCOS_INFRA_NODE_VOLUME_TYPE}}
-            credentialsSecret: null
             deviceIndex: 0
             iamInstanceProfile:
-              arn: null
-              filters: null
               id: {{rhcos_cluster_name.stdout}}-worker-profile
             instanceType: {{RHCOS_INFRA_NODE_INSTANCE_TYPE}}
-            keyName: null
             kind: AWSMachineProviderConfig
-            loadBalancers: null
             metadata:
               creationTimestamp: null
             placement:
@@ -58,19 +51,15 @@ items:
               region: {{rhcos_region.stdout}}
             publicIp: false
             securityGroups:
-            - arn: null
-              filters:
+            - filters:
               - name: tag:Name
                 values:
                 - {{rhcos_cluster_name.stdout}}_worker_sg
-              id: null
             subnet:
-              arn: null
               filters:
               - name: tag:Name
                 values:
-                - {{rhcos_cluster_name.stdout}}-worker-{{rhcos_region.stdout}}a
-              id: null
+                - {{rhcos_cluster_name.stdout}}-private-{{rhcos_region.stdout}}a
             tags:
             - name: openshiftClusterID
               value: {{rhcos_cluster_id.stdout}}
@@ -82,7 +71,7 @@ items:
           kubelet: ""
   status:
     replicas: 0
-- apiVersion: cluster.k8s.io/v1alpha1
+- apiVersion: machine.openshift.io/v1beta1
   kind: MachineSet
   metadata:
     creationTimestamp: null
@@ -91,7 +80,7 @@ items:
       sigs.k8s.io/cluster-api-machine-role: infra
       sigs.k8s.io/cluster-api-machine-type: infra
     name: {{rhcos_cluster_name.stdout}}-infra-{{rhcos_region.stdout}}b
-    namespace: openshift-cluster-api
+    namespace: openshift-machine-api
   spec:
     replicas: 1
     selector:
@@ -114,25 +103,18 @@ items:
         providerSpec:
           value:
             ami:
-              arn: null
-              filters: null
               id: {{rhcos_ami_id.stdout}}
-            apiVersion: awsproviderconfig.k8s.io/v1alpha1
+            apiVersion: awsproviderconfig.openshift.io/v1beta1
             blockDevices:
             - ebs:
                 iops: {{RHCOS_INFRA_NODE_VOLUME_IOPS}}
                 volumeSize: {{RHCOS_INFRA_NODE_VOLUME_SIZE}}
                 volumeType: {{RHCOS_INFRA_NODE_VOLUME_TYPE}}
-            credentialsSecret: null
             deviceIndex: 0
             iamInstanceProfile:
-              arn: null
-              filters: null
               id: {{rhcos_cluster_name.stdout}}-worker-profile
             instanceType: {{RHCOS_INFRA_NODE_INSTANCE_TYPE}}
-            keyName: null
             kind: AWSMachineProviderConfig
-            loadBalancers: null
             metadata:
               creationTimestamp: null
             placement:
@@ -140,19 +122,15 @@ items:
               region: {{rhcos_region.stdout}}
             publicIp: false
             securityGroups:
-            - arn: null
-              filters:
+            - filters:
               - name: tag:Name
                 values:
                 - {{rhcos_cluster_name.stdout}}_worker_sg
-              id: null
             subnet:
-              arn: null
               filters:
               - name: tag:Name
                 values:
-                - {{rhcos_cluster_name.stdout}}-worker-{{rhcos_region.stdout}}b
-              id: null
+                - {{rhcos_cluster_name.stdout}}-private-{{rhcos_region.stdout}}b
             tags:
             - name: openshiftClusterID
               value: {{rhcos_cluster_id.stdout}}
@@ -164,7 +142,7 @@ items:
           kubelet: ""
   status:
     replicas: 0
-- apiVersion: cluster.k8s.io/v1alpha1
+- apiVersion: machine.openshift.io/v1beta1
   kind: MachineSet
   metadata:
     creationTimestamp: null
@@ -173,7 +151,7 @@ items:
       sigs.k8s.io/cluster-api-machine-role: infra
       sigs.k8s.io/cluster-api-machine-type: infra
     name: {{rhcos_cluster_name.stdout}}-infra-{{rhcos_region.stdout}}c
-    namespace: openshift-cluster-api
+    namespace: openshift-machine-api
   spec:
     replicas: 1
     selector:
@@ -196,25 +174,18 @@ items:
         providerSpec:
           value:
             ami:
-              arn: null
-              filters: null
               id: {{rhcos_ami_id.stdout}}
-            apiVersion: awsproviderconfig.k8s.io/v1alpha1
+            apiVersion: awsproviderconfig.openshift.io/v1beta1
             blockDevices:
             - ebs:
                 iops: {{RHCOS_INFRA_NODE_VOLUME_IOPS}}
                 volumeSize: {{RHCOS_INFRA_NODE_VOLUME_SIZE}}
                 volumeType: {{RHCOS_INFRA_NODE_VOLUME_TYPE}}
-            credentialsSecret: null
             deviceIndex: 0
             iamInstanceProfile:
-              arn: null
-              filters: null
               id: {{rhcos_cluster_name.stdout}}-worker-profile
             instanceType: {{RHCOS_INFRA_NODE_INSTANCE_TYPE}}
-            keyName: null
             kind: AWSMachineProviderConfig
-            loadBalancers: null
             metadata:
               creationTimestamp: null
             placement:
@@ -222,19 +193,15 @@ items:
               region: {{rhcos_region.stdout}}
             publicIp: false
             securityGroups:
-            - arn: null
-              filters:
+            - filters:
               - name: tag:Name
                 values:
                 - {{rhcos_cluster_name.stdout}}_worker_sg
-              id: null
             subnet:
-              arn: null
               filters:
               - name: tag:Name
                 values:
-                - {{rhcos_cluster_name.stdout}}-worker-{{rhcos_region.stdout}}c
-              id: null
+                - {{rhcos_cluster_name.stdout}}-private-{{rhcos_region.stdout}}c
             tags:
             - name: openshiftClusterID
               value: {{rhcos_cluster_id.stdout}}
