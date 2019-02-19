@@ -8,10 +8,10 @@
     - { role: quickstart, when: OPENSHIFT_INSTALL | default(True) | bool }
     - { role: rhcos-post-install, when: OPENSHIFT_INSTALL | default(True) | bool }
     - { role: post-install, when: OPENSHIFT_INSTALL | default(True) | bool }
-     
+
 - hosts: controller
   remote_user: core
-  become: yes 
+  become: yes
   roles:
     - { role: controller-kickstart, when: OPENSHIFT_INSTALL | default(True) | bool }
     - { role: disable-selinux, when: (OPENSHIFT_INSTALL | default(False) | bool) and (DISABLE_SELINUX | default(False) | bool) }
