@@ -19,6 +19,10 @@
     {%raw%}oc get machineset -n openshift-machine-api -o=go-template='{{(index .items 0).spec.template.spec.providerSpec.value.placement.region}}'{%endraw%}
   register: rhcos_region
 
+- name: Get public subnet name
+  shell: aws ec2 describe-subnets --filters "Name=tag:kubernetes.io/cluster/{{ OPENSHIFT_INSTALL_CLUSTER_NAME }},Values=owned" "Name=cidrBlock,Values=10.0.0.0/20" | grep "Name" | awk '{print $3}'
+  register: rhcos_cluster_public_subnet
+
 - name: Place machineset yamls on master
   template:
     src: "{{item.src}}"
