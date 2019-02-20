@@ -49,7 +49,7 @@ items:
             placement:
               availabilityZone: {{rhcos_region.stdout}}a
               region: {{rhcos_region.stdout}}
-            publicIp: false
+            publicIp: true
             securityGroups:
             - filters:
               - name: tag:Name
@@ -59,7 +59,7 @@ items:
               filters:
               - name: tag:Name
                 values:
-                - {{rhcos_cluster_name.stdout}}-private-{{rhcos_region.stdout}}a
+                - {{ rhcos_cluster_public_subnet.stdout }}
             tags:
             - name: openshiftClusterID
               value: {{rhcos_cluster_id.stdout}}

@@ -1,8 +1,4 @@
 ---
-- name: pick one master node
-  shell: oc get nodes -l node-role.kubernetes.io/master | awk 'NR>1 {print $1}' | tail -n1
-  register: master_node
-
 - name: get the controller node
   shell: oc get nodes -l node-role.kubernetes.io/pbench="" | awk 'NR>1 {print $1}' | tail -n1
   register: controller_node
@@ -20,9 +16,9 @@
   shell: oc adm taint node {{ controller_node.stdout }} role=controller:NoSchedule
 
 - block:
-    - name: get the public ip of the master
-      shell: aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,Tags[?Key==`Name`].Value|[0],State.Name,PrivateIpAddress,PublicIpAddress, PrivateDnsName]' --output text | column -t | grep {{ OPENSHIFT_INSTALL_CLUSTER_NAME }} | grep {{ master_node.stdout }} | awk '{print $5}'
-      register: master_public_ip
+    - name: get the public ip of the pbench controller
+      shell: aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,Tags[?Key==`Name`].Value|[0],State.Name,PrivateIpAddress,PublicIpAddress, PrivateDnsName]' --output text | column -t | grep {{ OPENSHIFT_INSTALL_CLUSTER_NAME }} | grep {{ controller_node.stdout }} | awk '{print $5}'
+      register: controller_public_ip
 
     - name: get the private ip of the controller
       shell: aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,Tags[?Key==`Name`].Value|[0],State.Name,PrivateIpAddress,PublicIpAddress, PrivateDnsName]' --output text | column -t | grep {{ OPENSHIFT_INSTALL_CLUSTER_NAME }} | grep {{ controller_node.stdout }} | awk '{print $6}'
