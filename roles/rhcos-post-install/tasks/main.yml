@@ -20,7 +20,7 @@
   register: rhcos_region
 
 - name: Get public subnet name
-  shell: aws ec2 describe-subnets --filters "Name=tag:kubernetes.io/cluster/{{ OPENSHIFT_INSTALL_CLUSTER_NAME }},Values=owned" "Name=cidrBlock,Values=10.0.0.0/20" | grep "Name" | awk '{print $3}'
+  shell: aws ec2 describe-subnets --filters "Name=tag:kubernetes.io/cluster/{{ rhcos_cluster_name.stdout }},Values=owned" "Name=cidrBlock,Values=10.0.0.0/20" | grep -w "Name" | awk '{print $3}'
   register: rhcos_cluster_public_subnet
 
 - name: Place machineset yamls on master

@@ -54,7 +54,7 @@ items:
             - filters:
               - name: tag:Name
                 values:
-                - {{rhcos_cluster_name.stdout}}_worker_sg
+                - {{rhcos_cluster_name.stdout}}-worker-sg
             subnet:
               filters:
               - name: tag:Name
