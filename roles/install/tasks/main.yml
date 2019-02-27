@@ -121,7 +121,7 @@
   when: OPENSHIFT_INSTALL_PLATFORM == "libvirt"
 
 - block:
-    - name: run openshift installer on aws
+    - name: run openshift installer on aws using the image override
       shell: |
         set -o pipefail
         cd {{ workdir }}
@@ -130,7 +130,7 @@
         bin/openshift-install create cluster --log-level=debug 2>&1 | tee -a {{ OPENSHIFT_INSTALL_LOG_DIR }}/install.log
       when: (OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE is defined) and (OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE != "")
 
-    - name: run openshift installer on aws
+    - name: run openshift installer on aws using the default release image
       shell: |
         set -o pipefail
         cd {{ workdir }}
