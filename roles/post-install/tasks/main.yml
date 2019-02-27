@@ -45,6 +45,12 @@
         - "{{ security_groups.stdout_lines }}"
       ignore_errors: yes
 
+    - name: add inbound rule to allow traffic on 22
+      shell: aws ec2 authorize-security-group-ingress --group-id {{ item }} --protocol tcp --port 22 --cidr 0.0.0.0/0
+      with_items:
+        - "{{ security_groups.stdout_lines }}"
+      ignore_errors: yes
+
     - name: add inbound rule to allow traffic on 9090
       shell: aws ec2 authorize-security-group-ingress --group-id {{ item }} --protocol tcp --port 9090 --cidr 0.0.0.0/0
       with_items:
