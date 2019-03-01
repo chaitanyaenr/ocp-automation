@@ -9,13 +9,26 @@ data:
       nodeSelector:
         node-role.kubernetes.io/infra: ""
     prometheusK8s:
+      retention: {{PROMETHEUS_RETENTION_PERIOD}}
       baseImage: openshift/prometheus
       nodeSelector:
         node-role.kubernetes.io/infra: ""
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp2
+          resources:
+            requests:
+              storage: {{PROMETHEUS_STORAGE_SIZE}}
     alertmanagerMain:
       baseImage: openshift/prometheus-alertmanager
       nodeSelector:
         node-role.kubernetes.io/infra: ""
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp2
+          resources:
+            requests:
+              storage: {{ALERTMANAGER_STORAGE_SIZE}}
     nodeExporter:
       baseImage: openshift/prometheus-node-exporter
     kubeRbacProxy:
