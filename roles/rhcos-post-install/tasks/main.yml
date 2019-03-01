@@ -66,8 +66,8 @@
     oc adm taint node -l node-role.kubernetes.io/pbench= dedicated=pbench:NoSchedule
 
 - name: Copy new cluster-monitoring-config
-  copy:
-    src: cluster-monitoring-config.yml
+  template:
+    src: cluster-monitoring-config.yml.j2
     dest: /root/cluster-monitoring-config.yml
 
 - name: Replace the cluster-monitoring-config ConfigMap
