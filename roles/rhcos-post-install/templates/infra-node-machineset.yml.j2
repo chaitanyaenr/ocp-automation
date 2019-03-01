@@ -61,8 +61,6 @@ items:
                 values:
                 - {{rhcos_cluster_name.stdout}}-private-{{rhcos_region.stdout}}a
             tags:
-            - name: openshiftClusterID
-              value: {{rhcos_cluster_id.stdout}}
             - name: kubernetes.io/cluster/{{rhcos_cluster_name.stdout}}
               value: owned
             userDataSecret:
@@ -132,8 +130,6 @@ items:
                 values:
                 - {{rhcos_cluster_name.stdout}}-private-{{rhcos_region.stdout}}b
             tags:
-            - name: openshiftClusterID
-              value: {{rhcos_cluster_id.stdout}}
             - name: kubernetes.io/cluster/{{rhcos_cluster_name.stdout}}
               value: owned
             userDataSecret:
@@ -203,8 +199,6 @@ items:
                 values:
                 - {{rhcos_cluster_name.stdout}}-private-{{rhcos_region.stdout}}c
             tags:
-            - name: openshiftClusterID
-              value: {{rhcos_cluster_id.stdout}}
             - name: kubernetes.io/cluster/{{rhcos_cluster_name.stdout}}
               value: owned
             userDataSecret:
