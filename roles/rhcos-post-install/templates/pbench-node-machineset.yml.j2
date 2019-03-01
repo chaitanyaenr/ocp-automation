@@ -61,8 +61,6 @@ items:
                 values:
                 - {{ rhcos_cluster_public_subnet.stdout }}
             tags:
-            - name: openshiftClusterID
-              value: {{rhcos_cluster_id.stdout}}
             - name: kubernetes.io/cluster/{{rhcos_cluster_name.stdout}}
               value: owned
             userDataSecret:
