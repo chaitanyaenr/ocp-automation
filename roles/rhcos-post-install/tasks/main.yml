@@ -70,33 +70,27 @@
     oc create -f cluster-monitoring-config.yml
   ignore_errors: yes
 
-- name: Remove existing nodeSelector from monitoring
+- name: Remove existing nodeSelector from ingress-operator
   shell: |
-    oc patch deployment.apps/cluster-monitoring-operator -n openshift-monitoring --type json -p '[{"op": "remove", "path": "/spec/template/spec/nodeSelector"}]'
+    oc patch deployment.apps/ingress-operator -n openshift-ingress-operator --type json -p '[{"op": "remove", "path": "/spec/template/spec/nodeSelector"}]'
 
 - name: Remove existing nodeSelector from ingress
   shell: |
     oc patch clusteringresses/default -n openshift-ingress-operator --type json -p '[{"op": "remove", "path": "/spec/nodePlacement/nodeSelector/matchLabels"}]'
 
-- name: Apply new node-selector to infra workload components
+- name: Remove existing nodeSelector from monitoring-operator
+  shell: |
+    oc patch deployment.apps/cluster-monitoring-operator -n openshift-monitoring --type json -p '[{"op": "remove", "path": "/spec/template/spec/nodeSelector"}]'
+
+- name: Remove existing nodeSelector from registry-operator
+  shell: |
+    oc patch deployment.apps/cluster-image-registry-operator -n openshift-image-registry --type json -p '[{"op": "remove", "path": "/spec/template/spec/nodeSelector"}]'
+
+- name: Apply new nodeSelector to infra workload components
   shell: |
     oc patch {{item.object}} {{item.type|default('',True)}} -n {{item.namespace}} -p {{item.patch}}
   with_items:
-    # Monitoring (Relocate from worker nodes)
-    - namespace: openshift-monitoring
-      object: deployment.apps/cluster-monitoring-operator
-      patch: |
-        '{"spec": {"template": {"spec": {"nodeSelector": {"node-role.kubernetes.io/infra": ""}}}}}'
-     # Registry (Relocate from master nodes)  - Does not require CVO Disable
-    - namespace: openshift-image-registry
-      object: deployment.apps/cluster-image-registry-operator
-      patch: |
-        '{"spec": {"template": {"spec": {"nodeSelector": {"node-role.kubernetes.io/infra": ""}}}}}'
-    - namespace: openshift-image-registry
-      object: deployment.apps/image-registry
-      patch: |
-        '{"spec": {"template": {"spec": {"nodeSelector": {"node-role.kubernetes.io/infra": ""}}}}}'
-    # Ingress/Router (Relocate from worker nodes) - Does not require CVO Disable
+    # Ingress/Router (Relocate from worker nodes) - Does require CVO Disable
     - namespace: openshift-ingress-operator
       object: deployment.apps/ingress-operator
       patch: |
@@ -106,20 +100,45 @@
       patch: |
         '{"spec": {"nodePlacement": {"nodeSelector": {"matchLabels": {"node-role.kubernetes.io/infra": ""}}}}}'
       type: "--type merge"
-        # Logging (If it is installed)
-        # - namespace: openshift-logging
-        #   object: deployment.apps/cluster-logging-operator
-        #   patch: |
-        #     '{"spec": {"template": {"spec": {"nodeSelector": {"node-role.kubernetes.io/infra": ""}}}}}'
-        # - namespace: openshift-logging
-        #   object: deployment.apps/elasticsearch-clientdatamaster-0-1
-        #   patch: |
-        #     '{"spec": {"template": {"spec": {"nodeSelector": {"node-role.kubernetes.io/infra": ""}}}}}'
-        # - namespace: openshift-logging
-        #   object: deployment.apps/elasticsearch-operator
-        #   patch: |
-        #     '{"spec": {"template": {"spec": {"nodeSelector": {"node-role.kubernetes.io/infra": ""}}}}}'
-        # - namespace: openshift-logging
-        #   object: deployment.apps/kibana
-        #   patch: |
-        #     '{"spec": {"template": {"spec": {"nodeSelector": {"node-role.kubernetes.io/infra": ""}}}}}'
+    # Monitoring (Relocate from worker nodes) - Does not require CVO Disable
+    - namespace: openshift-monitoring
+      object: deployment.apps/cluster-monitoring-operator
+      patch: |
+        '{"spec": {"template": {"spec": {"nodeSelector": {"node-role.kubernetes.io/infra": ""}}}}}'
+    # Registry (Relocate from master nodes) - Does not require CVO Disable
+    - namespace: openshift-image-registry
+      object: deployment.apps/cluster-image-registry-operator
+      patch: |
+        '{"spec": {"template": {"spec": {"nodeSelector": {"node-role.kubernetes.io/infra": ""}}}}}'
+    - namespace: openshift-image-registry
+      object: deployment.apps/image-registry
+      patch: |
+        '{"spec": {"template": {"spec": {"nodeSelector": {"node-role.kubernetes.io/infra": ""}}}}}'
+
+    ## Logging (If it is installed)
+    # - namespace: openshift-logging
+    #   object: deployment.apps/cluster-logging-operator
+    #   patch: |
+    #     '{"spec": {"template": {"spec": {"nodeSelector": {"node-role.kubernetes.io/infra": ""}}}}}'
+    # - namespace: openshift-logging
+    #   object: deployment.apps/elasticsearch-clientdatamaster-0-1
+    #   patch: |
+    #     '{"spec": {"template": {"spec": {"nodeSelector": {"node-role.kubernetes.io/infra": ""}}}}}'
+    # - namespace: openshift-logging
+    #   object: deployment.apps/elasticsearch-operator
+    #   patch: |
+    #     '{"spec": {"template": {"spec": {"nodeSelector": {"node-role.kubernetes.io/infra": ""}}}}}'
+    # - namespace: openshift-logging
+    #   object: deployment.apps/kibana
+    #   patch: |
+    #     '{"spec": {"template": {"spec": {"nodeSelector": {"node-role.kubernetes.io/infra": ""}}}}}'
+
+# Remove after Bug https://bugzilla.redhat.com/show_bug.cgi?id=1683761 fixed
+- name: Remove existing nodeSelector from ingress
+  shell: |
+     oc patch deployment.apps/router-default -n openshift-ingress --type json -p '[{"op": "remove", "path": "/spec/template/spec/nodeSelector"}]'
+
+# Remove after Bug https://bugzilla.redhat.com/show_bug.cgi?id=1683761 fixed
+- name: Apply new NodeSelector to openshift routers
+  shell: |
+    oc patch deployment.apps/router-default -n openshift-ingress -p '{"spec": {"template": {"spec": {"nodeSelector": {"node-role.kubernetes.io/infra": ""}}}}}'
