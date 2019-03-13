@@ -53,25 +53,6 @@
     - /home/core/.ssh/config
     - /root/.ssh/config
 
-- name: copy clusterloader binary
-  copy:
-    src: /usr/libexec/atomic-openshift/extended.test
-    dest: "{{ item }}"
-    mode: 0755
-  with_items:
-    - /home/core/extended.test
-    - /root/extended.test
-
-- name: check if cluster loader binary exists
-  stat:
-    path: /home/core/extended.test
-  register: extended
-
-- name: fail if the extended.test binary doesn't exist
-  fail:
-    msg: Please make sure extended.test exists on {{ ansible_inventory_host }} at /usr/libexec/atomic-openshift/extended.test.
-  when: extended.stat.exists == False 
-
 - name: pbench-controller image
   shell: podman pull docker.io/ravielluri/image:controller
 
