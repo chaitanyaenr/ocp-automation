@@ -1,4 +1,9 @@
 ---
+- name: Get cluster name
+  shell: |
+        {%raw%}oc get machineset -n openshift-machine-api -o=go-template='{{(index (index .items 0).metadata.labels {%endraw%} "{{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-cluster" {%raw%})}}'{%endraw%}
+  register: rhcos_cluster_name
+
 - name: get the controller node
   shell: oc get nodes -l node-role.kubernetes.io/pbench="" | awk 'NR>1 {print $1}' | tail -n1
   register: controller_node
@@ -8,20 +13,16 @@
   with_items:
     - "role=controller"
 
-- name: remove the existing taint
-  shell: oc adm taint node {{ controller_node.stdout }} dedicated-
-  ignore_errors: yes
-
 - name: add a taint to the controller
   shell: oc adm taint node {{ controller_node.stdout }} role=controller:NoSchedule
 
 - block:
     - name: get the public ip of the pbench controller
-      shell: aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,Tags[?Key==`Name`].Value|[0],State.Name,PrivateIpAddress,PublicIpAddress, PrivateDnsName]' --output text | column -t | grep {{ OPENSHIFT_INSTALL_CLUSTER_NAME }} | grep {{ controller_node.stdout }} | awk '{print $5}'
+      shell: aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,Tags[?Key==`Name`].Value|[0],State.Name,PrivateIpAddress,PublicIpAddress, PrivateDnsName]' --output text | column -t | grep {{ rhcos_cluster_name.stdout }} | grep {{ controller_node.stdout }} | awk '{print $5}'
       register: controller_public_ip
 
     - name: get the private ip of the controller
-      shell: aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,Tags[?Key==`Name`].Value|[0],State.Name,PrivateIpAddress,PublicIpAddress, PrivateDnsName]' --output text | column -t | grep {{ OPENSHIFT_INSTALL_CLUSTER_NAME }} | grep {{ controller_node.stdout }} | awk '{print $6}'
+      shell: aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,Tags[?Key==`Name`].Value|[0],State.Name,PrivateIpAddress,PublicIpAddress, PrivateDnsName]' --output text | column -t | grep {{ rhcos_cluster_name.stdout }} | grep {{ controller_node.stdout }} | awk '{print $6}'
       register: controller_private_ip
 
     - name: add controller to group
@@ -32,7 +33,7 @@
         controller: "{{ controller_private_ip.stdout }}"
 
     - name: get VpcId
-      shell: aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,Tags[?Key==`Name`].Value|[0],State.Name,PrivateIpAddress,PublicIpAddress, PrivateDnsName, VpcId]' --output text | column -t | grep {{ OPENSHIFT_INSTALL_CLUSTER_NAME }} | awk '{print $7}' | grep -v '^$' | sort -u
+      shell: aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,Tags[?Key==`Name`].Value|[0],State.Name,PrivateIpAddress,PublicIpAddress, PrivateDnsName, VpcId]' --output text | column -t | grep {{ rhcos_cluster_name.stdout }} | awk '{print $7}' | grep -v '^$' | sort -u
       register: vpc_id
 
     - name: get security groups

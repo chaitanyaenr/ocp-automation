@@ -56,10 +56,6 @@
   shell: |
     oc scale --replicas 0 -n openshift-cluster-version deployments/cluster-version-operator
 
-- name: Taint the pbench controller node
-  shell: |
-    oc adm taint node -l node-role.kubernetes.io/pbench= dedicated=pbench:NoSchedule
-
 - name: Copy new cluster-monitoring-config
   template:
     src: cluster-monitoring-config.yml.j2
