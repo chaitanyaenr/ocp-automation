@@ -33,7 +33,11 @@ OPENSHIFT_INSTALL_LOG_DIR=/root/ocp
 OPENSHIFT_INSTALL_INSTALLER_VERSION=v0.12.0
 ### change this to v1beta1 when using installer version <= v0.11.0, also check the apiversion installer is using before setting this var
 OPENSHIFT_INSTALL_APIVERSION=v1beta2
-ansible_ssh_private_key_file=/root/.ssh/id_rsa_perf"
+
+# Ansible vars
+ansible_ssh_private_key_file=/root/.ssh/id_rsa_perf
+## Don't need to set the python_interpreter for image builds with el7 kernel
+ansible_python_interpreter=/usr/libexec/platform-python
 
 # AWS cluster vars
 AWS_PROFILE=
