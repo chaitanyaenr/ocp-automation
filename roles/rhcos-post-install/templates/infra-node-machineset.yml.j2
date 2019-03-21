@@ -5,25 +5,25 @@ items:
   metadata:
     creationTimestamp: null
     labels:
-      sigs.k8s.io/cluster-api-cluster: {{rhcos_cluster_name.stdout}}
-      sigs.k8s.io/cluster-api-machine-role: infra
-      sigs.k8s.io/cluster-api-machine-type: infra
+      {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-cluster: {{rhcos_cluster_name.stdout}}
+      {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-machine-role: infra
+      {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-machine-type: infra
     name: {{rhcos_cluster_name.stdout}}-infra-{{rhcos_region.stdout}}a
     namespace: openshift-machine-api
   spec:
     replicas: 1
     selector:
       matchLabels:
-        sigs.k8s.io/cluster-api-cluster: {{rhcos_cluster_name.stdout}}
-        sigs.k8s.io/cluster-api-machineset: {{rhcos_cluster_name.stdout}}-infra-{{rhcos_region.stdout}}a
+        {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-cluster: {{rhcos_cluster_name.stdout}}
+        {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-machineset: {{rhcos_cluster_name.stdout}}-infra-{{rhcos_region.stdout}}a
     template:
       metadata:
         creationTimestamp: null
         labels:
-          sigs.k8s.io/cluster-api-cluster: {{rhcos_cluster_name.stdout}}
-          sigs.k8s.io/cluster-api-machine-role: infra
-          sigs.k8s.io/cluster-api-machine-type: infra
-          sigs.k8s.io/cluster-api-machineset: {{rhcos_cluster_name.stdout}}-infra-{{rhcos_region.stdout}}a
+          {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-cluster: {{rhcos_cluster_name.stdout}}
+          {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-machine-role: infra
+          {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-machine-type: infra
+          {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-machineset: {{rhcos_cluster_name.stdout}}-infra-{{rhcos_region.stdout}}a
       spec:
         metadata:
           creationTimestamp: null
@@ -74,25 +74,25 @@ items:
   metadata:
     creationTimestamp: null
     labels:
-      sigs.k8s.io/cluster-api-cluster: {{rhcos_cluster_name.stdout}}
-      sigs.k8s.io/cluster-api-machine-role: infra
-      sigs.k8s.io/cluster-api-machine-type: infra
+      {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-cluster: {{rhcos_cluster_name.stdout}}
+      {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-machine-role: infra
+      {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-machine-type: infra
     name: {{rhcos_cluster_name.stdout}}-infra-{{rhcos_region.stdout}}b
     namespace: openshift-machine-api
   spec:
     replicas: 1
     selector:
       matchLabels:
-        sigs.k8s.io/cluster-api-cluster: {{rhcos_cluster_name.stdout}}
-        sigs.k8s.io/cluster-api-machineset: {{rhcos_cluster_name.stdout}}-infra-{{rhcos_region.stdout}}b
+        {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-cluster: {{rhcos_cluster_name.stdout}}
+        {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-machineset: {{rhcos_cluster_name.stdout}}-infra-{{rhcos_region.stdout}}b
     template:
       metadata:
         creationTimestamp: null
         labels:
-          sigs.k8s.io/cluster-api-cluster: {{rhcos_cluster_name.stdout}}
-          sigs.k8s.io/cluster-api-machine-role: infra
-          sigs.k8s.io/cluster-api-machine-type: infra
-          sigs.k8s.io/cluster-api-machineset: {{rhcos_cluster_name.stdout}}-infra-{{rhcos_region.stdout}}b
+          {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-cluster: {{rhcos_cluster_name.stdout}}
+          {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-machine-role: infra
+          {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-machine-type: infra
+          {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-machineset: {{rhcos_cluster_name.stdout}}-infra-{{rhcos_region.stdout}}b
       spec:
         metadata:
           creationTimestamp: null
@@ -143,25 +143,25 @@ items:
   metadata:
     creationTimestamp: null
     labels:
-      sigs.k8s.io/cluster-api-cluster: {{rhcos_cluster_name.stdout}}
-      sigs.k8s.io/cluster-api-machine-role: infra
-      sigs.k8s.io/cluster-api-machine-type: infra
+      {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-cluster: {{rhcos_cluster_name.stdout}}
+      {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-machine-role: infra
+      {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-machine-type: infra
     name: {{rhcos_cluster_name.stdout}}-infra-{{rhcos_region.stdout}}c
     namespace: openshift-machine-api
   spec:
     replicas: 1
     selector:
       matchLabels:
-        sigs.k8s.io/cluster-api-cluster: {{rhcos_cluster_name.stdout}}
-        sigs.k8s.io/cluster-api-machineset: {{rhcos_cluster_name.stdout}}-infra-{{rhcos_region.stdout}}c
+        {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-cluster: {{rhcos_cluster_name.stdout}}
+        {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-machineset: {{rhcos_cluster_name.stdout}}-infra-{{rhcos_region.stdout}}c
     template:
       metadata:
         creationTimestamp: null
         labels:
-          sigs.k8s.io/cluster-api-cluster: {{rhcos_cluster_name.stdout}}
-          sigs.k8s.io/cluster-api-machine-role: infra
-          sigs.k8s.io/cluster-api-machine-type: infra
-          sigs.k8s.io/cluster-api-machineset: {{rhcos_cluster_name.stdout}}-infra-{{rhcos_region.stdout}}c
+          {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-cluster: {{rhcos_cluster_name.stdout}}
+          {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-machine-role: infra
+          {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-machine-type: infra
+          {{RHCOS_METADATA_LABEL_PREFIX}}/cluster-api-machineset: {{rhcos_cluster_name.stdout}}-infra-{{rhcos_region.stdout}}c
       spec:
         metadata:
           creationTimestamp: null
