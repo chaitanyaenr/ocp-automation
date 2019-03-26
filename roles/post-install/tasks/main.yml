@@ -14,7 +14,7 @@
     - "role=controller"
 
 - name: add a taint to the controller
-  shell: oc adm taint node {{ controller_node.stdout }} role=controller:NoSchedule
+  shell: oc adm taint node {{ controller_node.stdout }} role=controller:NoSchedule --overwrite=true
 
 - block:
     - name: get the public ip of the pbench controller

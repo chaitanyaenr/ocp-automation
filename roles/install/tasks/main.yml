@@ -9,6 +9,8 @@
     - git
     - golang-bin
     - gcc-c++
+    - jq
+    - openshift-clients
     - python-pip
 
 - name: Install awscli
