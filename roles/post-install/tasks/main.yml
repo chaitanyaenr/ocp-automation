@@ -88,4 +88,18 @@
         src: ssh-config.j2
         dest: /root/.ssh/config
       delegate_to: localhost
+
+    - name: get the ocp nodes
+      shell: oc get nodes | awk 'NR>1 {print $1}'
+      register: ocp_nodes
+
+    - name: start sshd on the core nodes
+      shell: oc debug node/{{ item }} -- chroot /host /usr/bin/systemctl start sshd
+      with_items:
+        - "{{ ocp_nodes.stdout_lines }}"
+
+    - name: enable sshd on core cluster
+      shell: oc debug node/{{ item }} -- chroot /host /usr/bin/systemctl enable sshd
+      with_items:
+        - "{{ ocp_nodes.stdout_lines }}"
   when: OPENSHIFT_INSTALL_PLATFORM == "aws"
