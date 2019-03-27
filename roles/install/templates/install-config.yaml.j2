@@ -24,12 +24,13 @@ metadata:
   creationTimestamp: null
   name: {{ OPENSHIFT_INSTALL_CLUSTER_NAME }} 
 networking:
-  clusterNetworks:
+  clusterNetwork:
   - cidr: {{ OPENSHIFT_INSTALL_CIDR }}
-    hostSubnetLength: {{ OPENSHIFT_INSTALL_SUBNET_LENGTH }}
+    hostPrefix: {{ OPENSHIFT_INSTALL_HOST_PREFIX }}
   machineCIDR: {{ OPENSHIFT_INSTALL_MACHINE_CIDR }}
-  serviceCIDR: {{ OPENSHIFT_INSTALL_SERVICE_CIDR }}
-  type: OpenshiftSDN
+  networkType: OpenshiftSDN
+  serviceNetwork:
+  - {{ OPENSHIFT_INSTALL_SERVICE_NETWORK }}
 platform:
   aws:
     region: {{ OPENSHIFT_INSTALL_AWS_REGION }}
