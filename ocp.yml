@@ -16,7 +16,6 @@
     - { role: controller-kickstart, when: OPENSHIFT_INSTALL | default(True) | bool }
     - { role: disable-selinux, when: (OPENSHIFT_INSTALL | default(False) | bool) and (DISABLE_SELINUX | default(False) | bool) }
     - { role: node-config, when: OPENSHIFT_INSTALL | default(True) | bool }
-    #- { role: ssh-config, when: OPENSHIFT_INSTALL | default(False) | bool }
 
 - hosts: nodes
   remote_user: core

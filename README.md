@@ -4,7 +4,6 @@ Playbooks to install and configure OpenShift on rhcos.
 ### Prepare the Jump host
 - The jump host is the node which orchestrates the ocp install and configures the nodes to support the automation pipeline.
 - Jump host needs to be a RHEL box and preferred if it is based out of the AMI or QCOW image built by the image provisioner.
-- Ensure that the jump host has the extended.test binary under /usr/libexec/atomic-openshift dir.
 
 ### Run
 Clone the github repo:
@@ -60,8 +59,7 @@ $ ansible-playbook -vv -i ocp.inv ocp.yml
     │   └── templates
     │       ├── config.j2
     │       ├── credentials.j2
-    │       ├── install-config.yaml.j2
-    │       └── ocp-aws-env.sh.j2
+    │       └── install-config.yaml.j2
     ├── node-config
     │   └── tasks
     │       └── main.yml
@@ -77,23 +75,17 @@ $ ansible-playbook -vv -i ocp.inv ocp.yml
     │   └── tasks
     │       └── main.yml
     ├── rhcos-post-install
-    │   ├── files
-    │   │   └── cluster-monitoring-config.yml
     │   ├── tasks
     │   │   └── main.yml
     │   └── templates
+    │       ├── cluster-monitoring-config.yml.j2
     │       ├── infra-node-machineset.yml.j2
     │       └── pbench-node-machineset.yml.j2
-    ├── selinux
-    │   ├── files
-    │   │   ├── selinux_patch1.pp
-    │   │   ├── selinux_patch2.pp
-    │   │   └── selinux_patch3.pp
-    │   └── tasks
-    │       └── main.yml
-    └── ssh-config
-        ├── tasks
-        │   └── main.yml
-        └── templates
-            └── ssh-config.j2
+    └── selinux
+        ├── files
+        │   ├── selinux_patch1.pp
+        │   ├── selinux_patch2.pp
+        │   └── selinux_patch3.pp
+        └── tasks
+            └── main.yml
 ```
