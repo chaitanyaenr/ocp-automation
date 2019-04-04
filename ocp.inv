@@ -31,8 +31,11 @@ OPENSHIFT_INSTALL_VPC_CIDR_BLOCK=
 OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE=
 OPENSHIFT_INSTALL_LOG_DIR=/root/ocp
 OPENSHIFT_INSTALL_INSTALLER_VERSION=v0.15.0
+OPENSHIFT_INSTALL_USE_GIT_INSTALLER=False
+OPENSHIFT_INSTALL_BINARY_IMAGE=
+OPENSHIFT_INSTALL_QUAY_REGISTRY_TOKEN=
 ### change this to v1beta1 when using installer version <= v0.11.0, also check the apiversion installer is using before setting this var
-OPENSHIFT_INSTALL_APIVERSION=v1beta2
+OPENSHIFT_INSTALL_APIVERSION=v1beta4
 
 # Ansible vars
 ansible_ssh_private_key_file=/root/.ssh/id_rsa_perf
