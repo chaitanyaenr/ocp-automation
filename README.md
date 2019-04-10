@@ -1,3 +1,4 @@
+# This repo has been merged with https://github.com/redhat-performance/scale-ci-ansible, please refer to scale-ci-ansible for using the latest enhancements.
 # ocp-automation
 Playbooks to install and configure OpenShift on rhcos.
 
